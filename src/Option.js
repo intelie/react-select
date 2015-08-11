@@ -1,4 +1,5 @@
 var React = require('react');
+var getLabel = require('./immutable/utils').getLabel;
 
 var Option = React.createClass({
 	propTypes: {
@@ -23,7 +24,7 @@ var Option = React.createClass({
 				onMouseLeave={this.props.mouseLeave}
 				onMouseDown={this.props.mouseDown}
 				onClick={this.props.mouseDown}>
-				{ obj.create ? this.props.addLabelText.replace('{label}', obj.label) : renderedLabel }
+				{ obj.create ? this.props.addLabelText.replace('{label}', getLabel(obj)) : renderedLabel }
 			</div>
 		);
 	}

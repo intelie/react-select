@@ -1,4 +1,5 @@
 var React = require('react');
+var getLabel = require('./immutable/utils').getLabel;
 
 var Value = React.createClass({
 
@@ -24,7 +25,7 @@ var Value = React.createClass({
 	},
 
 	render: function() {
-		var label = this.props.option.label;
+		var label = getLabel(this.props.option);
 		if (this.props.renderer) {
 			label = this.props.renderer(this.props.option);
 		}
