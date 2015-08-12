@@ -10,6 +10,7 @@ var Value = require('./Value');
 var SingleValue = require('./SingleValue');
 var Option = require('./Option');
 var immutableUtils = require('./immutable/utils');
+require('./arrayFindPolyfill');
 
 var isImmutable = immutableUtils.isImmutable,
 		getValue = immutableUtils.getValue,
