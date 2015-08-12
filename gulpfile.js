@@ -18,6 +18,7 @@ var taskConfig = {
 		files: [
 			'index.html',
 			'standalone.html',
+			'immutable.html',
 			'.gitignore'
 		],
 		scripts: [

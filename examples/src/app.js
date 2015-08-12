@@ -2,6 +2,7 @@
 
 var React = require('react');
 var Select = require('react-select');
+var Immutable = require('immutable');
 var GravatarOption = require('./CustomOption');
 var GravatarValue = require('./CustomSingleValue');
 
@@ -425,6 +426,30 @@ var CustomRenderMultiField = React.createClass({
 	}
 });
 
+var ImmutableField = React.createClass({
+	onLabelClick: function (data, event) {
+		console.log(data, event);
+	},
+	render: function() {
+		var ops = Immutable.fromJS([
+			{ label: 'First Option', value: 'first' },
+			{ label: 'Second Option', value: 'second' },
+			{ label: 'Third Option', value: 'third' }
+		]);
+		return (
+			<div>
+				<label>{this.props.label}</label>
+				<Select
+					delimiter=","
+					multi={this.props.multi}
+					placeholder="Select your favourite(s)"
+					options={ops}
+					onChange={logChange} />
+			</div>
+		);
+	}
+});
+
 React.render(
 	<div>
 		<StatesField />
@@ -438,6 +463,8 @@ React.render(
 		<CustomRenderField label="Custom rendering for options and values:" />
 		<CustomRenderMultiField label="Custom rendering for multiple options and values:" />
 		<RemoteSelectField label="Remote Options:"/>
+		<ImmutableField label="Immutable single:" multi={false}/>
+		<ImmutableField label="Immutable multi:" multi={true}/>
 	</div>,
 	document.getElementById('example')
 );

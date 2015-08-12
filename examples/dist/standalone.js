@@ -3,6 +3,7 @@
 'use strict';
 
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+var getLabel = require('./immutable/utils').getLabel;
 
 var Option = React.createClass({
 	displayName: 'Option',
@@ -32,7 +33,7 @@ var Option = React.createClass({
 				onMouseLeave: this.props.mouseLeave,
 				onMouseDown: this.props.mouseDown,
 				onClick: this.props.mouseDown },
-			obj.create ? this.props.addLabelText.replace('{label}', obj.label) : renderedLabel
+			obj.create ? this.props.addLabelText.replace('{label}', getLabel(obj)) : renderedLabel
 		);
 	}
 });
@@ -40,7 +41,7 @@ var Option = React.createClass({
 module.exports = Option;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],2:[function(require,module,exports){
+},{"./immutable/utils":6}],2:[function(require,module,exports){
 (function (global){
 /* disable some rules until we refactor more completely; fixing them now would
    cause conflicts with some open PRs unnecessarily. */
@@ -53,9 +54,19 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var Input = (typeof window !== "undefined" ? window['AutosizeInput'] : typeof global !== "undefined" ? global['AutosizeInput'] : null);
 var classes = (typeof window !== "undefined" ? window['classNames'] : typeof global !== "undefined" ? global['classNames'] : null);
+var Immutable = (typeof window !== "undefined" ? window['Immutable'] : typeof global !== "undefined" ? global['Immutable'] : null);
 var Value = require('./Value');
 var SingleValue = require('./SingleValue');
 var Option = require('./Option');
+var immutableUtils = require('./immutable/utils');
+require('./arrayFindPolyfill');
+
+var isImmutable = immutableUtils.isImmutable,
+    getValue = immutableUtils.getValue,
+    getLabel = immutableUtils.getLabel,
+    getValueProp = immutableUtils.getValueProp,
+    getLength = immutableUtils.getLength,
+    getAt = immutableUtils.getAt;
 
 var requestId = 0;
 
@@ -104,15 +115,15 @@ var Select = React.createClass({
 
 	getDefaultProps: function getDefaultProps() {
 		return {
-			addLabelText: 'Add {label} ?',
+			addLabelText: 'Adicionar {label} ?',
 			allowCreate: false,
 			asyncOptions: undefined,
 			autoload: true,
 			backspaceRemoves: true,
 			cacheAsyncResults: true,
 			className: undefined,
-			clearAllText: 'Clear all',
-			clearValueText: 'Clear value',
+			clearAllText: 'Limpar todos',
+			clearValueText: 'Limpar',
 			clearable: true,
 			delimiter: ',',
 			disabled: false,
@@ -122,14 +133,14 @@ var Select = React.createClass({
 			matchProp: 'any',
 			name: undefined,
 			newOptionCreator: undefined,
-			noResultsText: 'No results found',
+			noResultsText: 'Nenhum resultado encontrado',
 			onChange: undefined,
 			onOptionLabelClick: undefined,
 			optionComponent: Option,
 			options: undefined,
-			placeholder: 'Select...',
+			placeholder: 'Selecione...',
 			searchable: true,
-			searchPromptText: 'Type to search',
+			searchPromptText: 'Digite para buscar',
 			singleValueComponent: SingleValue,
 			value: undefined,
 			valueComponent: Value
@@ -284,18 +295,19 @@ var Select = React.createClass({
 
 		var focusedOption;
 		var valueForState = null;
-		if (!this.props.multi && values.length) {
-			focusedOption = values[0];
-			valueForState = values[0].value;
+		if (!this.props.multi && getLength(values)) {
+			focusedOption = getAt(values, 0);;
+			valueForState = getValue(getAt(values, 0));
 		} else {
-			for (var optionIndex = 0; optionIndex < filteredOptions.length; ++optionIndex) {
-				if (!filteredOptions[optionIndex].disabled) {
-					focusedOption = filteredOptions[optionIndex];
+			for (var optionIndex = 0; optionIndex < getLength(filteredOptions); ++optionIndex) {
+				var option = getAt(filteredOptions, optionIndex);
+				if (!getValueProp(option, 'disabled')) {
+					focusedOption = option;
 					break;
 				}
 			}
 			valueForState = values.map(function (v) {
-				return v.value;
+				return getValue(v);
 			}).join(this.props.delimiter);
 		}
 
@@ -304,27 +316,26 @@ var Select = React.createClass({
 			values: values,
 			inputValue: '',
 			filteredOptions: filteredOptions,
-			placeholder: !this.props.multi && values.length ? values[0].label : placeholder,
+			placeholder: !this.props.multi && getLength(values) ? getLabel(getAt(values, 0)) : placeholder,
 			focusedOption: focusedOption
 		};
 	},
 
 	initValuesArray: function initValuesArray(values, options) {
-		if (!Array.isArray(values)) {
+		if (!Array.isArray(values) && !Immutable.Iterable.isIndexed(values)) {
 			if (typeof values === 'string') {
-				values = values === '' ? [] : values.split(this.props.delimiter);
+				values = values === '' ? Immutable.List() : Immutable.List(values.split(this.props.delimiter));
 			} else {
-				values = values !== undefined && values !== null ? [values] : [];
+				values = values !== undefined && values !== null ? Immutable.List([values]) : Immutable.List();
 			}
 		}
 		return values.map(function (val) {
 			if (typeof val === 'string' || typeof val === 'number') {
-				for (var key in options) {
-					if (options.hasOwnProperty(key) && options[key] && (options[key].value === val || typeof options[key].value === 'number' && options[key].value.toString() === val)) {
-						return options[key];
-					}
-				}
-				return { value: val, label: val };
+				return options.find(function (op) {
+					var opValue = getValue(op);
+
+					return opValue === val || typeof opValue === 'number' && opValue.toString() === val;
+				}) || Immutable.Map({ value: val, label: val });
 			} else {
 				return val;
 			}
@@ -355,7 +366,7 @@ var Select = React.createClass({
 	},
 
 	popValue: function popValue() {
-		this.setValue(this.state.values.slice(0, this.state.values.length - 1));
+		this.setValue(this.state.values.slice(0, getLength(this.state.values) - 1));
 	},
 
 	removeValue: function removeValue(valueToRemove) {
@@ -515,12 +526,10 @@ var Select = React.createClass({
 	// Ensures that the currently focused option is available in filteredOptions.
 	// If not, returns the first available option.
 	_getNewFocusedOption: function _getNewFocusedOption(filteredOptions) {
-		for (var key in filteredOptions) {
-			if (filteredOptions.hasOwnProperty(key) && filteredOptions[key] === this.state.focusedOption) {
-				return filteredOptions[key];
-			}
-		}
-		return filteredOptions[0];
+		var focusedOption = this.state.focusedOption;
+		return filteredOptions.find(function (op) {
+			return op === focusedOption;
+		}) || getAt(filteredOptions, 0);
 	},
 
 	handleInputChange: function handleInputChange(event) {
@@ -610,17 +619,17 @@ var Select = React.createClass({
 
 	filterOptions: function filterOptions(options, values) {
 		var filterValue = this._optionsFilterString;
-		var exclude = (values || this.state.values).map(function (i) {
-			return i.value;
+		var exclude = (values || this.state.values).map(function (v) {
+			return getValue(v);
 		});
 		if (this.props.filterOptions) {
 			return this.props.filterOptions.call(this, options, filterValue, exclude);
 		} else {
 			var filterOption = function filterOption(op) {
-				if (this.props.multi && exclude.indexOf(op.value) > -1) return false;
+				if (this.props.multi && exclude.indexOf(getValue(op)) > -1) return false;
 				if (this.props.filterOption) return this.props.filterOption.call(this, op, filterValue);
-				var valueTest = String(op.value),
-				    labelTest = String(op.label);
+				var valueTest = String(getValue(op)),
+				    labelTest = String(getLabel(op));
 				if (this.props.ignoreCase) {
 					valueTest = valueTest.toLowerCase();
 					labelTest = labelTest.toLowerCase();
@@ -656,34 +665,34 @@ var Select = React.createClass({
 	focusAdjacentOption: function focusAdjacentOption(dir) {
 		this._focusedOptionReveal = true;
 		var ops = this.state.filteredOptions.filter(function (op) {
-			return !op.disabled;
+			return !getValueProp(op, 'disabled');
 		});
 		if (!this.state.isOpen) {
 			this.setState({
 				isOpen: true,
 				inputValue: '',
-				focusedOption: this.state.focusedOption || ops[dir === 'next' ? 0 : ops.length - 1]
+				focusedOption: this.state.focusedOption || getAt(ops, dir === 'next' ? 0 : getLength(ops) - 1)
 			}, this._bindCloseMenuIfClickedOutside);
 			return;
 		}
-		if (!ops.length) {
+		if (!getLength(ops)) {
 			return;
 		}
 		var focusedIndex = -1;
-		for (var i = 0; i < ops.length; i++) {
-			if (this.state.focusedOption === ops[i]) {
+		for (var i = 0; i < getLength(ops); i++) {
+			if (this.state.focusedOption === getAt(ops, i)) {
 				focusedIndex = i;
 				break;
 			}
 		}
-		var focusedOption = ops[0];
-		if (dir === 'next' && focusedIndex > -1 && focusedIndex < ops.length - 1) {
-			focusedOption = ops[focusedIndex + 1];
+		var focusedOption = getAt(ops, 0);
+		if (dir === 'next' && focusedIndex > -1 && focusedIndex < getLength(ops) - 1) {
+			focusedOption = getAt(ops, focusedIndex + 1);
 		} else if (dir === 'previous') {
 			if (focusedIndex > 0) {
-				focusedOption = ops[focusedIndex - 1];
+				focusedOption = getAt(ops, focusedIndex - 1);
 			} else {
-				focusedOption = ops[ops.length - 1];
+				focusedOption = getAt(ops, ops.length - 1);
 			}
 		}
 		this.setState({
@@ -700,41 +709,43 @@ var Select = React.createClass({
 	},
 
 	buildMenu: function buildMenu() {
-		var focusedValue = this.state.focusedOption ? this.state.focusedOption.value : null;
+		var focusedValue = this.state.focusedOption ? getValue(this.state.focusedOption) : null;
 		var renderLabel = this.props.optionRenderer || function (op) {
-			return op.label;
+			return getLabel(op);
 		};
-		if (this.state.filteredOptions.length > 0) {
-			focusedValue = focusedValue == null ? this.state.filteredOptions[0] : focusedValue;
+		if (getLength(this.state.filteredOptions) > 0) {
+			focusedValue = focusedValue == null ? getAt(this.state.filteredOptions, 0) : focusedValue;
 		}
-		// Add the current value to the filtered options in last resort
+
 		var options = this.state.filteredOptions;
-		if (this.props.allowCreate && this.state.inputValue.trim()) {
-			var inputValue = this.state.inputValue;
-			options = options.slice();
-			var newOption = this.props.newOptionCreator ? this.props.newOptionCreator(inputValue) : {
-				value: inputValue,
-				label: inputValue,
-				create: true
-			};
-			options.unshift(newOption);
-		}
-		var ops = Object.keys(options).map(function (key) {
-			var op = options[key];
-			var isSelected = this.state.value === op.value;
-			var isFocused = focusedValue === op.value;
+
+		//TODO: support allowCreate (it mutates `options`, which is supposed to be immutable, calling `unshift` below)
+		// Add the current value to the filtered options in last resort
+		// if (this.props.allowCreate && this.state.inputValue.trim()) {
+		// 	var inputValue = this.state.inputValue;
+		// 	options = options.slice();
+		// 	var newOption = this.props.newOptionCreator ? this.props.newOptionCreator(inputValue) : {
+		// 		value: inputValue,
+		// 		label: inputValue,
+		// 		create: true
+		// 	};
+		// 	options.unshift(newOption);
+		// }
+		var ops = options.map(function (op, key) {
+			var isSelected = this.state.value === getValue(op);
+			var isFocused = focusedValue === getValue(op);
 			var optionClass = classes({
 				'Select-option': true,
 				'is-selected': isSelected,
 				'is-focused': isFocused,
-				'is-disabled': op.disabled
+				'is-disabled': getValueProp(op, 'disabled')
 			});
 			var ref = isFocused ? 'focused' : null;
 			var mouseEnter = this.focusOption.bind(this, op);
 			var mouseLeave = this.unfocusOption.bind(this, op);
 			var mouseDown = this.selectValue.bind(this, op);
 			var optionResult = React.createElement(this.props.optionComponent, {
-				key: 'option-' + op.value,
+				key: 'option-' + getValue(op),
 				className: optionClass,
 				renderFunc: renderLabel,
 				mouseEnter: mouseEnter,
@@ -776,7 +787,7 @@ var Select = React.createClass({
 				var onOptionLabelClick = this.handleOptionLabelClick.bind(this, val);
 				var onRemove = this.removeValue.bind(this, val);
 				var valueComponent = React.createElement(this.props.valueComponent, {
-					key: val.value,
+					key: getValue(val),
 					option: val,
 					renderer: this.props.valueRenderer,
 					optionLabelClick: !!this.props.onOptionLabelClick,
@@ -789,8 +800,8 @@ var Select = React.createClass({
 		}
 
 		if (!this.state.inputValue && (!this.props.multi || !value.length)) {
-			var val = this.state.values[0] || null;
-			if (this.props.valueRenderer && !!this.state.values.length) {
+			var val = getAt(this.state.values, 0) || null;
+			if (this.props.valueRenderer && !!getLength(this.state.values)) {
 				value.push(React.createElement(Value, {
 					key: 0,
 					option: val,
@@ -854,7 +865,7 @@ var Select = React.createClass({
 					' '
 				);
 			}
-		} else if (!this.props.multi || !this.state.values.length) {
+		} else if (!this.props.multi || !getLength(this.state.values)) {
 			input = React.createElement(
 				'div',
 				{ className: 'Select-input' },
@@ -885,7 +896,7 @@ var Select = React.createClass({
 module.exports = Select;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Option":1,"./SingleValue":3,"./Value":4}],3:[function(require,module,exports){
+},{"./Option":1,"./SingleValue":3,"./Value":4,"./arrayFindPolyfill":5,"./immutable/utils":6}],3:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -915,6 +926,7 @@ module.exports = SingleValue;
 'use strict';
 
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+var getLabel = require('./immutable/utils').getLabel;
 
 var Value = React.createClass({
 
@@ -940,7 +952,7 @@ var Value = React.createClass({
 	},
 
 	render: function render() {
-		var label = this.props.option.label;
+		var label = getLabel(this.props.option);
 		if (this.props.renderer) {
 			label = this.props.renderer(this.props.option);
 		}
@@ -988,5 +1000,87 @@ var Value = React.createClass({
 module.exports = Value;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./immutable/utils":6}],5:[function(require,module,exports){
+'use strict';
+
+//source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+if (!Array.prototype.find) {
+  Array.prototype.find = function (predicate) {
+    if (this === null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+}
+
+},{}],6:[function(require,module,exports){
+'use strict';
+
+function isImmutable(obj) {
+  return typeof obj.toJS != 'undefined';
+}
+
+function getValueProp(obj, property) {
+  if (!obj) {
+    return null;
+  }
+  if (isImmutable(obj)) {
+    return obj.get(property);
+  }
+  return obj[property];
+}
+
+function getValue(obj) {
+  return getValueProp(obj, 'value');
+}
+
+function getLabel(obj) {
+  return getValueProp(obj, 'label');
+}
+
+function getLength(obj) {
+  if (!obj) {
+    return 0;
+  }
+  if (isImmutable(obj)) {
+    return obj.size;
+  }
+  return obj.length;
+}
+
+function getAt(obj, index) {
+  if (!obj) {
+    return null;
+  }
+  if (isImmutable(obj)) {
+    return obj.get(index);
+  }
+
+  return obj[index];
+}
+
+module.exports = {
+  isImmutable: isImmutable,
+  getValue: getValue,
+  getLabel: getLabel,
+  getValueProp: getValueProp,
+  getLength: getLength,
+  getAt: getAt
+};
+
 },{}]},{},[2])(2)
 });
