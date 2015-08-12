@@ -41,7 +41,7 @@ var Option = React.createClass({
 module.exports = Option;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./immutable/utils":5}],2:[function(require,module,exports){
+},{"./immutable/utils":6}],2:[function(require,module,exports){
 (function (global){
 /* disable some rules until we refactor more completely; fixing them now would
    cause conflicts with some open PRs unnecessarily. */
@@ -54,11 +54,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var Input = (typeof window !== "undefined" ? window['AutosizeInput'] : typeof global !== "undefined" ? global['AutosizeInput'] : null);
 var classes = (typeof window !== "undefined" ? window['classNames'] : typeof global !== "undefined" ? global['classNames'] : null);
-var Immutable = require('immutable');
+var Immutable = (typeof window !== "undefined" ? window['Immutable'] : typeof global !== "undefined" ? global['Immutable'] : null);
 var Value = require('./Value');
 var SingleValue = require('./SingleValue');
 var Option = require('./Option');
 var immutableUtils = require('./immutable/utils');
+require('./arrayFindPolyfill');
 
 var isImmutable = immutableUtils.isImmutable,
     getValue = immutableUtils.getValue,
@@ -68,6 +69,15 @@ var isImmutable = immutableUtils.isImmutable,
     getAt = immutableUtils.getAt;
 
 var requestId = 0;
+
+// testa por value, por se tiver eid
+var isEqualValue = function isEqualValue(v1, v2) {
+	return Immutable.is(v1, v2) || v1 && v2 && v1.has && v1.has('eid') && Immutable.is(v1.get('eid'), v2.get('eid'));
+};
+
+var compareOptions = function compareOptions(ops1, ops2) {
+	return isImmutable(ops1, ops2) ? Immutable.is(ops1, ops2) : JSON.stringify(ops1) === JSON.stringify(ops2);
+};
 
 var Select = React.createClass({
 
@@ -102,7 +112,7 @@ var Select = React.createClass({
 		onOptionLabelClick: React.PropTypes.func, // onCLick handler for value labels: function (value, event) {}
 		optionComponent: React.PropTypes.func, // option component to render in dropdown
 		optionRenderer: React.PropTypes.func, // optionRenderer: function(option) {}
-		options: React.PropTypes.array, // array of options
+		options: React.PropTypes.oneOfType([React.PropTypes.array, React.PropTypes.instanceOf(Immutable.List)]), // array of options
 		placeholder: React.PropTypes.string, // field placeholder, displayed when there's no value
 		searchable: React.PropTypes.bool, // whether to enable searching feature or not
 		searchPromptText: React.PropTypes.string, // label to prompt for search input
@@ -221,7 +231,7 @@ var Select = React.createClass({
 		var _this2 = this;
 
 		var optionsChanged = false;
-		if (JSON.stringify(newProps.options) !== JSON.stringify(this.props.options)) {
+		if (!compareOptions(newProps.options, this.props.options)) {
 			optionsChanged = true;
 			this.setState({
 				options: newProps.options,
@@ -361,7 +371,11 @@ var Select = React.createClass({
 	},
 
 	addValue: function addValue(value) {
-		this.setValue(this.state.values.concat(value));
+		if (isImmutable(value) && isImmutable(this.state.values)) {
+			this.setValue(this.state.values.push(value));
+		} else {
+			this.setValue(this.state.values.concat(value));
+		}
 	},
 
 	popValue: function popValue() {
@@ -691,7 +705,7 @@ var Select = React.createClass({
 			if (focusedIndex > 0) {
 				focusedOption = getAt(ops, focusedIndex - 1);
 			} else {
-				focusedOption = getAt(ops, ops.length - 1);
+				focusedOption = getAt(ops, getLength(ops) - 1);
 			}
 		}
 		this.setState({
@@ -757,7 +771,7 @@ var Select = React.createClass({
 			});
 			return optionResult;
 		}, this);
-		return ops.length ? ops : React.createElement(
+		return getLength(ops) ? ops : React.createElement(
 			'div',
 			{ className: 'Select-noresults' },
 			this.props.asyncOptions && !this.state.inputValue ? this.props.searchPromptText : this.props.noResultsText
@@ -895,7 +909,7 @@ var Select = React.createClass({
 module.exports = Select;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Option":1,"./SingleValue":3,"./Value":4,"./immutable/utils":5,"immutable":undefined}],3:[function(require,module,exports){
+},{"./Option":1,"./SingleValue":3,"./Value":4,"./arrayFindPolyfill":5,"./immutable/utils":6}],3:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -999,7 +1013,34 @@ var Value = React.createClass({
 module.exports = Value;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./immutable/utils":5}],5:[function(require,module,exports){
+},{"./immutable/utils":6}],5:[function(require,module,exports){
+'use strict';
+
+//source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+if (!Array.prototype.find) {
+  Array.prototype.find = function (predicate) {
+    if (this === null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+}
+
+},{}],6:[function(require,module,exports){
 'use strict';
 
 function isImmutable(obj) {

@@ -21,6 +21,20 @@ var isImmutable = immutableUtils.isImmutable,
 
 var requestId = 0;
 
+// test by value, por eid if available
+var isEqualValue = function(v1, v2) {
+  return Immutable.is(v1, v2) || (
+    v1 && v2 && v1.has && v1.has('eid') &&
+    Immutable.is(v1.get('eid'), v2.get('eid'))
+  );
+};
+
+var compareOptions = function(ops1, ops2){
+	return isImmutable(ops1, ops2) ? 
+					Immutable.is(ops1, ops2) : 
+					JSON.stringify(ops1) === JSON.stringify(ops2);
+};
+
 var Select = React.createClass({
 
 	displayName: 'Select',
@@ -172,14 +186,14 @@ var Select = React.createClass({
 
 	componentWillReceiveProps: function(newProps) {
 		var optionsChanged = false;
-		if (JSON.stringify(newProps.options) !== JSON.stringify(this.props.options)) {
+		if (!compareOptions(newProps.options, this.props.options)) {
 			optionsChanged = true;
 			this.setState({
 				options: newProps.options,
 				filteredOptions: this.filterOptions(newProps.options)
 			});
 		}
-		if (newProps.value !== this.state.value || newProps.placeholder !== this.props.placeholder || optionsChanged) {
+		if (!isEqualValue(newProps.value, this.state.value) || newProps.placeholder !== this.props.placeholder || optionsChanged) {
 			var setState = (newState) => {
 				this.setState(this.getStateFromValue(newProps.value,
 					(newState && newState.options) || newProps.options,
@@ -283,7 +297,7 @@ var Select = React.createClass({
 				return options.find(op => {
 					var opValue = getValue(op);
 
-					return opValue === val || typeof opValue === 'number' && opValue.toString() === val
+					return isEqualValue(opValue, val) || typeof opValue === 'number' && opValue.toString() === val
 				}) || Immutable.Map({ value: val, label: val });
 			} else {
 				return val;
@@ -624,7 +638,7 @@ var Select = React.createClass({
 		}
 		var focusedIndex = -1;
 		for (var i = 0; i < getLength(ops); i++) {
-			if (this.state.focusedOption === getAt(ops,i)) {
+			if (isEqualValue(this.state.focusedOption, getAt(ops,i))) {
 				focusedIndex = i;
 				break;
 			}
@@ -645,7 +659,7 @@ var Select = React.createClass({
 	},
 
 	unfocusOption: function(op) {
-		if (this.state.focusedOption === op) {
+		if (isEqualValue(this.state.focusedOption, op)) {
 			this.setState({
 				focusedOption: null
 			});
@@ -676,8 +690,8 @@ var Select = React.createClass({
 		// 	options.unshift(newOption);
 		// }
 		var ops = options.map(function(op, key) {
-			var isSelected = this.state.value === getValue(op);
-			var isFocused = focusedValue === getValue(op);
+			var isSelected = isEqualValue(this.state.value, getValue(op));
+			var isFocused = isEqualValue(focusedValue, getValue(op));
 			var optionClass = classes({
 				'Select-option': true,
 				'is-selected': isSelected,
