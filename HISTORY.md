@@ -1,5 +1,9 @@
 # React-Select
 
+## v0.7.1 / 2015-08-12
+
+* added; Immutable peerDependency v3.7.0 for better compatibility
+
 ## v0.7.0 / 2015-08-12
 
 * added; Support for Immutable.JS data structures
