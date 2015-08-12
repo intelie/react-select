@@ -9,6 +9,7 @@ var Immutable = require('immutable');
 var Value = require('./Value');
 var SingleValue = require('./SingleValue');
 var Option = require('./Option');
+var LazyRender = require('./LazyRender');
 var immutableUtils = require('./immutable/utils');
 require('./arrayFindPolyfill');
 
@@ -79,7 +80,8 @@ var Select = React.createClass({
 		value: React.PropTypes.any,                // initial field value
 		valueComponent: React.PropTypes.func,      // value component to render in multiple mode
 		valueRenderer: React.PropTypes.func,       // valueRenderer: function(option) {}
-		styleMenuOuter: React.PropTypes.object 		 // styleMenuOuter: style object used by menu dropdown
+		styleMenuOuter: React.PropTypes.object, 	 // styleMenuOuter: style object used by menu dropdown
+		lazy: React.PropTypes.bool								 // lazy: use LazyRender for dropdown items
 	},
 
 	getDefaultProps: function() {
@@ -112,7 +114,9 @@ var Select = React.createClass({
 			searchPromptText: 'Digite para buscar',
 			singleValueComponent: SingleValue,
 			value: undefined,
-			valueComponent: Value
+			valueComponent: Value,
+			lazy: false,
+			styleMenuOuter: {}
 		};
 	},
 
@@ -789,11 +793,25 @@ var Select = React.createClass({
 			if (this.props.multi) {
 				menuProps.onMouseDown = this.handleMouseDown;
 			}
-			menu = (
-				<div ref="selectMenuContainer" className="Select-menu-outer" style={this.props.styleMenuOuter}>
-					<div {...menuProps}>{this.buildMenu()}</div>
-				</div>
-			);
+			
+			if(this.props.lazy){
+				menu = (
+					<div ref="selectMenuContainer" className="Select-menu-outer" style={this.props.styleMenuOuter}>
+						<LazyRender maxHeight={this.props.styleMenuOuter.maxHeight || 200}
+	          	          className={this.props.className}
+  	          	        ref="container">
+    	        {this.buildMenu()}
+  	        </LazyRender>
+	        </div>
+				);
+			}
+			else{
+				menu = (
+					<div ref="selectMenuContainer" className="Select-menu-outer" style={this.props.styleMenuOuter}>
+						<div {...menuProps}>{this.buildMenu()}</div>
+					</div>
+				);
+			}
 		}
 
 		var input;

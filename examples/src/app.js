@@ -450,6 +450,27 @@ var ImmutableField = React.createClass({
 	}
 });
 
+var LazyField = React.createClass({
+	onLabelClick: function (data, event) {
+		console.log(data, event);
+	},
+	render: function() {
+		var ops = Immutable.Range(1, 1000).map(i => ({ label: i.toString(), value: i })).toList();
+		return (
+			<div>
+				<label>{this.props.label}</label>
+				<Select
+					delimiter=","
+					multi={this.props.multi}
+					placeholder="Select your favourite(s)"
+					options={ops}
+					onChange={logChange}
+					lazy={true} />
+			</div>
+		);
+	}
+});
+
 React.render(
 	<div>
 		<StatesField />
@@ -465,6 +486,7 @@ React.render(
 		<RemoteSelectField label="Remote Options:"/>
 		<ImmutableField label="Immutable single:" multi={false}/>
 		<ImmutableField label="Immutable multi:" multi={true}/>
+		<LazyField label="Lazy with Immutable data" />
 	</div>,
 	document.getElementById('example')
 );
