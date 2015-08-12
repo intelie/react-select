@@ -1,40 +1,4 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Select = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = getSize
-
-function getSize(element) {
-  // Handle cases where the element is not already
-  // attached to the DOM by briefly appending it
-  // to document.body, and removing it again later.
-  if (element === window || element === document.body) {
-    return [window.innerWidth, window.innerHeight]
-  }
-
-  if (!element.parentNode) {
-    var temporary = true
-    document.body.appendChild(element)
-  }
-
-  var bounds = element.getBoundingClientRect()
-  var styles = getComputedStyle(element)
-  var height = (bounds.height|0)
-    + parse(styles.getPropertyValue('margin-top'))
-    + parse(styles.getPropertyValue('margin-bottom'))
-  var width  = (bounds.width|0)
-    + parse(styles.getPropertyValue('margin-left'))
-    + parse(styles.getPropertyValue('margin-right'))
-
-  if (temporary) {
-    document.body.removeChild(element)
-  }
-
-  return [width, height]
-}
-
-function parse(prop) {
-  return parseFloat(prop) || 0
-}
-
-},{}],2:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -200,7 +164,7 @@ var LazyRender = React.createClass({
 module.exports = LazyRender;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"element-size":1}],3:[function(require,module,exports){
+},{"element-size":undefined}],2:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -243,7 +207,7 @@ var Option = React.createClass({
 module.exports = Option;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./immutable/utils":8}],4:[function(require,module,exports){
+},{"./immutable/utils":7}],3:[function(require,module,exports){
 (function (global){
 /* disable some rules until we refactor more completely; fixing them now would
    cause conflicts with some open PRs unnecessarily. */
@@ -1131,7 +1095,7 @@ var Select = React.createClass({
 module.exports = Select;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./LazyRender":2,"./Option":3,"./SingleValue":5,"./Value":6,"./arrayFindPolyfill":7,"./immutable/utils":8}],5:[function(require,module,exports){
+},{"./LazyRender":1,"./Option":2,"./SingleValue":4,"./Value":5,"./arrayFindPolyfill":6,"./immutable/utils":7}],4:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -1156,7 +1120,7 @@ var SingleValue = React.createClass({
 module.exports = SingleValue;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1235,7 +1199,7 @@ var Value = React.createClass({
 module.exports = Value;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./immutable/utils":8}],7:[function(require,module,exports){
+},{"./immutable/utils":7}],6:[function(require,module,exports){
 'use strict';
 
 //source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
@@ -1262,7 +1226,7 @@ if (!Array.prototype.find) {
   };
 }
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 function isImmutable(obj) {
@@ -1317,5 +1281,5 @@ module.exports = {
   getAt: getAt
 };
 
-},{}]},{},[4])(4)
+},{}]},{},[3])(3)
 });
