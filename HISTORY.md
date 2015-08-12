@@ -1,5 +1,10 @@
 # React-Select
 
+## v0.7.0 / 2015-08-12
+
+* added; Support for Immutable.JS data structures
+* added; Support for lazy render of option dropdown
+
 ## v0.6.1 / 2015-08-09
 
 * added; Support for options with numeric values, thanks [Dave Brotherstone](https://github.com/bruderstein)
