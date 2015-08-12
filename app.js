@@ -77,6 +77,7 @@ module.exports = SingleValue;
 
 var React = require('react');
 var Select = require('react-select');
+var Immutable = require('immutable');
 var GravatarOption = require('./CustomOption');
 var GravatarValue = require('./CustomSingleValue');
 
@@ -578,6 +579,61 @@ var CustomRenderMultiField = React.createClass({
 	}
 });
 
+var ImmutableField = React.createClass({
+	displayName: 'ImmutableField',
+
+	onLabelClick: function onLabelClick(data, event) {
+		console.log(data, event);
+	},
+	render: function render() {
+		var ops = Immutable.fromJS([{ label: 'First Option', value: 'first' }, { label: 'Second Option', value: 'second' }, { label: 'Third Option', value: 'third' }]);
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'label',
+				null,
+				this.props.label
+			),
+			React.createElement(Select, {
+				delimiter: ',',
+				multi: this.props.multi,
+				placeholder: 'Select your favourite(s)',
+				options: ops,
+				onChange: logChange })
+		);
+	}
+});
+
+var LazyField = React.createClass({
+	displayName: 'LazyField',
+
+	onLabelClick: function onLabelClick(data, event) {
+		console.log(data, event);
+	},
+	render: function render() {
+		var ops = Immutable.Range(1, 1000).map(function (i) {
+			return { label: i.toString(), value: i };
+		}).toList();
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'label',
+				null,
+				this.props.label
+			),
+			React.createElement(Select, {
+				delimiter: ',',
+				multi: this.props.multi,
+				placeholder: 'Select your favourite(s)',
+				options: ops,
+				onChange: logChange,
+				lazy: true })
+		);
+	}
+});
+
 React.render(React.createElement(
 	'div',
 	null,
@@ -591,10 +647,13 @@ React.render(React.createElement(
 	React.createElement(SelectedValuesFieldCreate, { label: 'Option Creation (tags mode):' }),
 	React.createElement(CustomRenderField, { label: 'Custom rendering for options and values:' }),
 	React.createElement(CustomRenderMultiField, { label: 'Custom rendering for multiple options and values:' }),
-	React.createElement(RemoteSelectField, { label: 'Remote Options:' })
+	React.createElement(RemoteSelectField, { label: 'Remote Options:' }),
+	React.createElement(ImmutableField, { label: 'Immutable single:', multi: false }),
+	React.createElement(ImmutableField, { label: 'Immutable multi:', multi: true }),
+	React.createElement(LazyField, { label: 'Lazy with Immutable data' })
 ), document.getElementById('example'));
 
-},{"./CustomOption":1,"./CustomSingleValue":2,"./data/states":4,"./data/users":5,"react":undefined,"react-select":undefined}],4:[function(require,module,exports){
+},{"./CustomOption":1,"./CustomSingleValue":2,"./data/states":4,"./data/users":5,"immutable":undefined,"react":undefined,"react-select":undefined}],4:[function(require,module,exports){
 'use strict';
 
 exports.AU = [{ value: 'australian-capital-territory', label: 'Australian Capital Territory' }, { value: 'new-south-wales', label: 'New South Wales' }, { value: 'victoria', label: 'Victoria' }, { value: 'queensland', label: 'Queensland' }, { value: 'western-australia', label: 'Western Australia' }, { value: 'south-australia', label: 'South Australia' }, { value: 'tasmania', label: 'Tasmania' }, { value: 'northern-territory', label: 'Northern Territory' }];

@@ -1,5 +1,171 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Select = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
+"use strict";
+
+// from
+// https://raw.githubusercontent.com/onefinestay/react-lazy-render/master/src/LazyRender.jsx
+// Modificações para aceitar lazy immutable seq.
+
+var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+var Immutable = (typeof window !== "undefined" ? window['Immutable'] : typeof global !== "undefined" ? global['Immutable'] : null);
+var elementSize = require("element-size");
+
+function count(children) {
+  return children.count ? children.count() : children.length;
+}
+
+var LazyRender = React.createClass({
+  displayName: 'LazyRender',
+
+  propTypes: {
+    children: React.PropTypes.instanceOf(Immutable.Iterable),
+    maxHeight: React.PropTypes.number.isRequired,
+
+    className: React.PropTypes.string,
+    itemPadding: React.PropTypes.number
+  },
+
+  getDefaultProps: function getDefaultProps() {
+    return {
+      itemPadding: 3
+    };
+  },
+
+  getInitialState: function getInitialState() {
+    return {
+      childrenTop: 0,
+      childrenToRender: 10,
+      scrollTop: 0,
+      height: this.props.maxHeight,
+      count: count(this.props.children)
+    };
+  },
+
+  onScroll: function onScroll() {
+    var container = this.refs.container.getDOMNode();
+    var scrollTop = container.scrollTop;
+
+    var childrenTop = Math.floor(scrollTop / this.state.childHeight);
+    var childrenBottom = this.state.count - childrenTop - this.state.childrenToRender;
+
+    if (childrenBottom < 0) {
+      childrenBottom = 0;
+    }
+
+    this.setState({
+      childrenTop: childrenTop,
+      childrenBottom: childrenBottom,
+      scrollTop: scrollTop
+    });
+  },
+
+  getHeight: function getHeight(numChildren, childHeight, maxHeight) {
+    var fullHeight = numChildren * childHeight;
+    if (fullHeight < maxHeight) {
+      return fullHeight;
+    } else {
+      return maxHeight;
+    }
+  },
+
+  getElementHeight: function getElementHeight(element) {
+    var marginTop = parseInt(window.getComputedStyle(element).marginTop);
+    return elementSize(element)[1] - marginTop; //remove one margin since the margins are shared by adjacent elements
+  },
+
+  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+    var length = count(nextProps.children);
+    var childHeight = this.state.childHeight;
+    var childrenTop = Math.floor(this.state.scrollTop / childHeight);
+    var childrenBottom = length - childrenTop - this.state.childrenToRender;
+
+    if (childrenBottom < 0) {
+      childrenBottom = 0;
+    }
+
+    var height = this.getHeight(length, childHeight, nextProps.maxHeight);
+
+    var numberOfItems = Math.ceil(height / childHeight);
+
+    if (height === this.props.maxHeight) {
+      numberOfItems += this.props.itemPadding;
+    }
+
+    this.setState({
+      childrenTop: childrenTop,
+      childrenBottom: childrenBottom,
+      childrenToRender: numberOfItems,
+      height: height,
+      count: length
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+    var childHeight = this.getChildHeight();
+    var length = count(this.props.children);
+
+    var height = this.getHeight(length, childHeight, this.props.maxHeight);
+
+    var numberOfItems = Math.ceil(height / childHeight);
+
+    if (height === this.props.maxHeight) {
+      numberOfItems += this.props.itemPadding;
+    }
+
+    this.setState({
+      childHeight: childHeight,
+      childrenToRender: numberOfItems,
+      childrenTop: 0,
+      childrenBottom: length - numberOfItems,
+      height: height
+    });
+  },
+
+  componentDidUpdate: function componentDidUpdate() {
+    //important to update the child height in the case that the children change(example: ajax call for data)
+    if (this.state.childHeight !== this.getChildHeight()) {
+      this.setState({ childHeight: this.getChildHeight() });
+    }
+  },
+
+  getChildHeight: function getChildHeight() {
+    var firstChild = this.refs['child-0'];
+    var el = firstChild.getDOMNode();
+    return this.getElementHeight(el);
+  },
+
+  render: function render() {
+    var start = this.state.childrenTop;
+    var end = this.state.childrenTop + this.state.childrenToRender;
+
+    var childrenToRender = this.props.children.slice(start, end);
+    var children = childrenToRender.map(function (child, index) {
+      if (index === 0) {
+        return React.cloneElement(child, { ref: 'child-' + index, key: index });
+      }
+      return child;
+    });
+
+    children = Immutable.Seq.of(React.createElement('div', { style: { height: this.state.childrenTop * this.state.childHeight },
+      key: 'top' })).concat(children).concat(React.createElement('div', { style: { height: this.state.childrenBottom * this.state.childHeight },
+      key: 'bottom' }));
+
+    return React.createElement(
+      'div',
+      { style: { height: this.state.height, overflowY: 'auto' },
+        className: this.props.className,
+        ref: 'container',
+        onScroll: this.onScroll },
+      children
+    );
+  }
+});
+
+module.exports = LazyRender;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"element-size":undefined}],2:[function(require,module,exports){
+(function (global){
 'use strict';
 
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
@@ -41,7 +207,7 @@ var Option = React.createClass({
 module.exports = Option;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./immutable/utils":5}],2:[function(require,module,exports){
+},{"./immutable/utils":7}],3:[function(require,module,exports){
 (function (global){
 /* disable some rules until we refactor more completely; fixing them now would
    cause conflicts with some open PRs unnecessarily. */
@@ -54,11 +220,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var Input = (typeof window !== "undefined" ? window['AutosizeInput'] : typeof global !== "undefined" ? global['AutosizeInput'] : null);
 var classes = (typeof window !== "undefined" ? window['classNames'] : typeof global !== "undefined" ? global['classNames'] : null);
-var Immutable = require('immutable');
+var Immutable = (typeof window !== "undefined" ? window['Immutable'] : typeof global !== "undefined" ? global['Immutable'] : null);
 var Value = require('./Value');
 var SingleValue = require('./SingleValue');
 var Option = require('./Option');
+var LazyRender = require('./LazyRender');
 var immutableUtils = require('./immutable/utils');
+require('./arrayFindPolyfill');
 
 var isImmutable = immutableUtils.isImmutable,
     getValue = immutableUtils.getValue,
@@ -68,6 +236,15 @@ var isImmutable = immutableUtils.isImmutable,
     getAt = immutableUtils.getAt;
 
 var requestId = 0;
+
+// test by value, por eid if available
+var isEqualValue = function isEqualValue(v1, v2) {
+	return Immutable.is(v1, v2) || v1 && v2 && v1.has && v1.has('eid') && Immutable.is(v1.get('eid'), v2.get('eid'));
+};
+
+var compareOptions = function compareOptions(ops1, ops2) {
+	return isImmutable(ops1, ops2) ? Immutable.is(ops1, ops2) : JSON.stringify(ops1) === JSON.stringify(ops2);
+};
 
 var Select = React.createClass({
 
@@ -102,14 +279,16 @@ var Select = React.createClass({
 		onOptionLabelClick: React.PropTypes.func, // onCLick handler for value labels: function (value, event) {}
 		optionComponent: React.PropTypes.func, // option component to render in dropdown
 		optionRenderer: React.PropTypes.func, // optionRenderer: function(option) {}
-		options: React.PropTypes.array, // array of options
+		options: React.PropTypes.oneOfType([React.PropTypes.array, React.PropTypes.instanceOf(Immutable.List)]), // array of options
 		placeholder: React.PropTypes.string, // field placeholder, displayed when there's no value
 		searchable: React.PropTypes.bool, // whether to enable searching feature or not
 		searchPromptText: React.PropTypes.string, // label to prompt for search input
 		singleValueComponent: React.PropTypes.func, // single value component when multiple is set to false
 		value: React.PropTypes.any, // initial field value
 		valueComponent: React.PropTypes.func, // value component to render in multiple mode
-		valueRenderer: React.PropTypes.func // valueRenderer: function(option) {}
+		valueRenderer: React.PropTypes.func, // valueRenderer: function(option) {}
+		styleMenuOuter: React.PropTypes.object, // styleMenuOuter: style object used by menu dropdown
+		lazy: React.PropTypes.bool // lazy: use LazyRender for dropdown items
 	},
 
 	getDefaultProps: function getDefaultProps() {
@@ -142,7 +321,9 @@ var Select = React.createClass({
 			searchPromptText: 'Digite para buscar',
 			singleValueComponent: SingleValue,
 			value: undefined,
-			valueComponent: Value
+			valueComponent: Value,
+			lazy: false,
+			styleMenuOuter: {}
 		};
 	},
 
@@ -221,14 +402,14 @@ var Select = React.createClass({
 		var _this2 = this;
 
 		var optionsChanged = false;
-		if (JSON.stringify(newProps.options) !== JSON.stringify(this.props.options)) {
+		if (!compareOptions(newProps.options, this.props.options)) {
 			optionsChanged = true;
 			this.setState({
 				options: newProps.options,
 				filteredOptions: this.filterOptions(newProps.options)
 			});
 		}
-		if (newProps.value !== this.state.value || newProps.placeholder !== this.props.placeholder || optionsChanged) {
+		if (!isEqualValue(newProps.value, this.state.value) || newProps.placeholder !== this.props.placeholder || optionsChanged) {
 			var setState = function setState(newState) {
 				_this2.setState(_this2.getStateFromValue(newProps.value, newState && newState.options || newProps.options, newProps.placeholder));
 			};
@@ -333,7 +514,7 @@ var Select = React.createClass({
 				return options.find(function (op) {
 					var opValue = getValue(op);
 
-					return opValue === val || typeof opValue === 'number' && opValue.toString() === val;
+					return isEqualValue(opValue, val) || typeof opValue === 'number' && opValue.toString() === val;
 				}) || Immutable.Map({ value: val, label: val });
 			} else {
 				return val;
@@ -361,7 +542,11 @@ var Select = React.createClass({
 	},
 
 	addValue: function addValue(value) {
-		this.setValue(this.state.values.concat(value));
+		if (isImmutable(value) && isImmutable(this.state.values)) {
+			this.setValue(this.state.values.push(value));
+		} else {
+			this.setValue(this.state.values.concat(value));
+		}
 	},
 
 	popValue: function popValue() {
@@ -679,7 +864,7 @@ var Select = React.createClass({
 		}
 		var focusedIndex = -1;
 		for (var i = 0; i < getLength(ops); i++) {
-			if (this.state.focusedOption === getAt(ops, i)) {
+			if (isEqualValue(this.state.focusedOption, getAt(ops, i))) {
 				focusedIndex = i;
 				break;
 			}
@@ -691,7 +876,7 @@ var Select = React.createClass({
 			if (focusedIndex > 0) {
 				focusedOption = getAt(ops, focusedIndex - 1);
 			} else {
-				focusedOption = getAt(ops, ops.length - 1);
+				focusedOption = getAt(ops, getLength(ops) - 1);
 			}
 		}
 		this.setState({
@@ -700,7 +885,7 @@ var Select = React.createClass({
 	},
 
 	unfocusOption: function unfocusOption(op) {
-		if (this.state.focusedOption === op) {
+		if (isEqualValue(this.state.focusedOption, op)) {
 			this.setState({
 				focusedOption: null
 			});
@@ -731,8 +916,8 @@ var Select = React.createClass({
 		// 	options.unshift(newOption);
 		// }
 		var ops = options.map(function (op, key) {
-			var isSelected = this.state.value === getValue(op);
-			var isFocused = focusedValue === getValue(op);
+			var isSelected = isEqualValue(this.state.value, getValue(op));
+			var isFocused = isEqualValue(focusedValue, getValue(op));
 			var optionClass = classes({
 				'Select-option': true,
 				'is-selected': isSelected,
@@ -757,7 +942,7 @@ var Select = React.createClass({
 			});
 			return optionResult;
 		}, this);
-		return ops.length ? ops : React.createElement(
+		return getLength(ops) ? ops : React.createElement(
 			'div',
 			{ className: 'Select-noresults' },
 			this.props.asyncOptions && !this.state.inputValue ? this.props.searchPromptText : this.props.noResultsText
@@ -829,15 +1014,30 @@ var Select = React.createClass({
 			if (this.props.multi) {
 				menuProps.onMouseDown = this.handleMouseDown;
 			}
-			menu = React.createElement(
-				'div',
-				{ ref: 'selectMenuContainer', className: 'Select-menu-outer' },
-				React.createElement(
+
+			if (this.props.lazy) {
+				menu = React.createElement(
 					'div',
-					menuProps,
-					this.buildMenu()
-				)
-			);
+					{ ref: 'selectMenuContainer', className: 'Select-menu-outer', style: this.props.styleMenuOuter },
+					React.createElement(
+						LazyRender,
+						{ maxHeight: this.props.styleMenuOuter.maxHeight || 200,
+							className: this.props.className,
+							ref: 'container' },
+						this.buildMenu()
+					)
+				);
+			} else {
+				menu = React.createElement(
+					'div',
+					{ ref: 'selectMenuContainer', className: 'Select-menu-outer', style: this.props.styleMenuOuter },
+					React.createElement(
+						'div',
+						menuProps,
+						this.buildMenu()
+					)
+				);
+			}
 		}
 
 		var input;
@@ -895,7 +1095,7 @@ var Select = React.createClass({
 module.exports = Select;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Option":1,"./SingleValue":3,"./Value":4,"./immutable/utils":5,"immutable":undefined}],3:[function(require,module,exports){
+},{"./LazyRender":1,"./Option":2,"./SingleValue":4,"./Value":5,"./arrayFindPolyfill":6,"./immutable/utils":7}],4:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -920,7 +1120,7 @@ var SingleValue = React.createClass({
 module.exports = SingleValue;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -999,11 +1199,38 @@ var Value = React.createClass({
 module.exports = Value;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./immutable/utils":5}],5:[function(require,module,exports){
+},{"./immutable/utils":7}],6:[function(require,module,exports){
+'use strict';
+
+//source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+if (!Array.prototype.find) {
+  Array.prototype.find = function (predicate) {
+    if (this === null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+}
+
+},{}],7:[function(require,module,exports){
 'use strict';
 
 function isImmutable(obj) {
-  return typeof obj.toJS != 'undefined';
+  return obj != null && typeof obj.toJS == 'function';
 }
 
 function getValueProp(obj, property) {
@@ -1054,5 +1281,5 @@ module.exports = {
   getAt: getAt
 };
 
-},{}]},{},[2])(2)
+},{}]},{},[3])(3)
 });
