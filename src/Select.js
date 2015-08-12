@@ -78,7 +78,8 @@ var Select = React.createClass({
 		singleValueComponent: React.PropTypes.func,// single value component when multiple is set to false
 		value: React.PropTypes.any,                // initial field value
 		valueComponent: React.PropTypes.func,      // value component to render in multiple mode
-		valueRenderer: React.PropTypes.func        // valueRenderer: function(option) {}
+		valueRenderer: React.PropTypes.func,       // valueRenderer: function(option) {}
+		styleMenuOuter: React.PropTypes.object 		 // styleMenuOuter: style object used by menu dropdown
 	},
 
 	getDefaultProps: function() {
@@ -789,7 +790,7 @@ var Select = React.createClass({
 				menuProps.onMouseDown = this.handleMouseDown;
 			}
 			menu = (
-				<div ref="selectMenuContainer" className="Select-menu-outer">
+				<div ref="selectMenuContainer" className="Select-menu-outer" style={this.props.styleMenuOuter}>
 					<div {...menuProps}>{this.buildMenu()}</div>
 				</div>
 			);

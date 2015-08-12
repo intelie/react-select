@@ -119,7 +119,8 @@ var Select = React.createClass({
 		singleValueComponent: React.PropTypes.func, // single value component when multiple is set to false
 		value: React.PropTypes.any, // initial field value
 		valueComponent: React.PropTypes.func, // value component to render in multiple mode
-		valueRenderer: React.PropTypes.func // valueRenderer: function(option) {}
+		valueRenderer: React.PropTypes.func, // valueRenderer: function(option) {}
+		styleMenuOuter: React.PropTypes.object // styleMenuOuter: style object used by menu dropdown
 	},
 
 	getDefaultProps: function getDefaultProps() {
@@ -845,7 +846,7 @@ var Select = React.createClass({
 			}
 			menu = React.createElement(
 				'div',
-				{ ref: 'selectMenuContainer', className: 'Select-menu-outer' },
+				{ ref: 'selectMenuContainer', className: 'Select-menu-outer', style: this.props.styleMenuOuter },
 				React.createElement(
 					'div',
 					menuProps,
@@ -1044,7 +1045,7 @@ if (!Array.prototype.find) {
 'use strict';
 
 function isImmutable(obj) {
-  return obj != null && typeof obj.toJS != 'undefined';
+  return obj != null && typeof obj.toJS == 'function';
 }
 
 function getValueProp(obj, property) {
