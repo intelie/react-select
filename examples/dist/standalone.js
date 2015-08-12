@@ -362,7 +362,11 @@ var Select = React.createClass({
 	},
 
 	addValue: function addValue(value) {
-		this.setValue(this.state.values.concat(value));
+		if (isImmutable(value) && isImmutable(this.state.values)) {
+			this.setValue(this.state.values.push(value));
+		} else {
+			this.setValue(this.state.values.concat(value));
+		}
 	},
 
 	popValue: function popValue() {
@@ -692,7 +696,7 @@ var Select = React.createClass({
 			if (focusedIndex > 0) {
 				focusedOption = getAt(ops, focusedIndex - 1);
 			} else {
-				focusedOption = getAt(ops, ops.length - 1);
+				focusedOption = getAt(ops, getLength(ops) - 1);
 			}
 		}
 		this.setState({
@@ -758,7 +762,7 @@ var Select = React.createClass({
 			});
 			return optionResult;
 		}, this);
-		return ops.length ? ops : React.createElement(
+		return getLength(ops) ? ops : React.createElement(
 			'div',
 			{ className: 'Select-noresults' },
 			this.props.asyncOptions && !this.state.inputValue ? this.props.searchPromptText : this.props.noResultsText
