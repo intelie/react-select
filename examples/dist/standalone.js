@@ -103,7 +103,7 @@ var Select = React.createClass({
 		onOptionLabelClick: React.PropTypes.func, // onCLick handler for value labels: function (value, event) {}
 		optionComponent: React.PropTypes.func, // option component to render in dropdown
 		optionRenderer: React.PropTypes.func, // optionRenderer: function(option) {}
-		options: React.PropTypes.array, // array of options
+		options: React.PropTypes.oneOfType([React.PropTypes.array, React.PropTypes.instanceOf(Immutable.List)]), // array of options
 		placeholder: React.PropTypes.string, // field placeholder, displayed when there's no value
 		searchable: React.PropTypes.bool, // whether to enable searching feature or not
 		searchPromptText: React.PropTypes.string, // label to prompt for search input
