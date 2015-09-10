@@ -645,7 +645,7 @@ var Select = React.createClass({
     }
 
     // Normaliza implementação passando ás veses value, ás vezes option aqui:
-    if (value instanceof Immutable.Map && value.count() == 2 && value.has('value') && value.has('label')) {
+    if (typeof value == 'object' && value.value && value.label && (value instanceof Immutable.Map && value.count() == 2 && value.has('value') && value.has('label'))) {
       value = getValue(value);
     }
 
