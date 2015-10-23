@@ -134,6 +134,10 @@ var LazyRender = React.createClass({
   },
 
   render: function render() {
+    if (!this.props.children.slice) {
+      return this.props.children;
+    }
+
     var start = this.state.childrenTop;
     var end = this.state.childrenTop + this.state.childrenToRender;
 
@@ -644,9 +648,8 @@ var Select = React.createClass({
       placeholder = this.props.placeholder;
     }
 
-    // FIX:
     // Normaliza implementação passando ás veses value, ás vezes option aqui:
-    if (value && typeof value == 'object' && value.value || value instanceof Immutable.Map && value.has('value')) {
+    if (value && typeof value == 'object' && value.value && value.label || value instanceof Immutable.Map && value.has('value') && value.has('label')) {
       value = getValue(value);
     }
 
