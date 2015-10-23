@@ -141,6 +141,10 @@ var LazyRender = React.createClass({
   },
 
   render: function() {
+    if(!this.props.children.slice) {
+      return this.props.children;
+    }
+
     var start = this.state.childrenTop;
     var end = this.state.childrenTop + this.state.childrenToRender;
 
