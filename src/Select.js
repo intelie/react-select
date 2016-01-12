@@ -258,7 +258,7 @@ var Select = React.createClass({
     }
 
     // Normaliza implementação passando ás veses value, ás vezes option aqui:
-    if((value && typeof value == 'object' && value.value && value.label) ||
+    if(((value != null) && typeof value == 'object' && (value.value != null) && (value.label != null)) ||
        (value instanceof Immutable.Map && value.has('value') && value.has('label'))) {
       value = getValue(value);
     }
