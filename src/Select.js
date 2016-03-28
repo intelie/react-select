@@ -297,25 +297,26 @@ var Select = React.createClass({
     };
   },
 
-  initValuesArray: function(values, options) {
-    if (!Array.isArray(values) && !Immutable.Iterable.isIndexed(values)) {
-      if (typeof values === 'string') {
-        values = values === '' ? Immutable.List() : Immutable.List(values.split(this.props.delimiter));
-      } else {
-        values = values !== undefined && values !== null ? Immutable.List([values]) : Immutable.List();
-      }
-    }
-    return values.map(function(val) {
+	initValuesArray: function(values, options) {
+		if (!Array.isArray(values) && !Immutable.Iterable.isIndexed(values)) {
+			if (typeof values === 'string') {
+				values = values === '' ? Immutable.List() : Immutable.List(values.split(this.props.delimiter));
+			} else {
+				values = values !== undefined && values !== null ? Immutable.List([values]) : Immutable.List();
+			}
+		}
+		return values.map(function(val) {
+			if (typeof val === 'string' || typeof val === 'number') {
+				return options.find(op => {
+						var opValue = getValue(op);
 
-      return options.find(op => {
-        var opValue = getValue(op);
-        return isEqualValue(opValue, val) || (typeof opValue === 'number' && opValue.toString() === val);
-
-        // auto create option
-      }) || Immutable.Map({ value: val, label: val });
-
-    });
-  },
+						return isEqualValue(opValue, val) || typeof opValue === 'number' && opValue.toString() === val
+					}) || Immutable.Map({ value: val, label: val });
+			} else {
+				return val;
+			}
+		});
+	},
 
   setValue: function(value, focusAfterUpdate) {
     if (focusAfterUpdate || focusAfterUpdate === undefined) {

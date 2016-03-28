@@ -1,6 +1,7 @@
 /* eslint react/prop-types: 0 */
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Select = require('react-select');
 var Immutable = require('immutable');
 var GravatarOption = require('./CustomOption');
@@ -48,7 +49,7 @@ var UsersField = React.createClass({
 });
 
 var ValuesAsNumbersField = React.createClass({
-	
+
 	getInitialState: function () {
 		return {
 			options: [
@@ -65,7 +66,7 @@ var ValuesAsNumbersField = React.createClass({
 			multi: false
 		};
 	},
-	
+
 	onChangeMatchStart(event) {
 		this.setState({
 			matchPos: event.target.checked ? 'start' : 'any'
@@ -83,32 +84,32 @@ var ValuesAsNumbersField = React.createClass({
 			matchLabel: event.target.checked
 		});
 	},
-	
+
 	onChange(value, values) {
 		this.setState({
 			value: value
 		});
 		logChange(value, values);
 	},
-	
+
 	onChangeMulti(event) {
 		this.setState({
 			multi: event.target.checked
 		});
 	},
-	
+
 	render: function () {
-		
+
 		var matchProp = 'any';
-		
+
 		if (this.state.matchLabel && !this.state.matchValue) {
 			matchProp = 'label';
 		}
-		
+
 		if (!this.state.matchLabel && this.state.matchValue) {
 			matchProp = 'value';
 		}
-		
+
 		return (
 			<div>
 				<label>{this.props.label}</label>
@@ -471,7 +472,7 @@ var LazyField = React.createClass({
 	}
 });
 
-React.render(
+ReactDOM.render(
 	<div>
 		<StatesField />
 		<StatesField label="States (non-searchable):" searchable={false} />

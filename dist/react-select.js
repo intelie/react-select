@@ -42,7 +42,7 @@ var LazyRender = React.createClass({
   },
 
   onScroll: function onScroll() {
-    var container = this.refs.container.getDOMNode();
+    var container = this.refs.container;
     var scrollTop = container.scrollTop;
 
     var childrenTop = Math.floor(scrollTop / this.state.childHeight);
@@ -130,7 +130,7 @@ var LazyRender = React.createClass({
 
   getChildHeight: function getChildHeight() {
     var firstChild = this.refs['child-0'];
-    var el = firstChild.getDOMNode();
+    var el = firstChild;
     return this.getElementHeight(el);
   },
 
@@ -222,6 +222,7 @@ module.exports = Option;
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+var ReactDOM = (typeof window !== "undefined" ? window['ReactDOM'] : typeof global !== "undefined" ? global['ReactDOM'] : null);
 var Input = (typeof window !== "undefined" ? window['AutosizeInput'] : typeof global !== "undefined" ? global['AutosizeInput'] : null);
 var classes = (typeof window !== "undefined" ? window['classNames'] : typeof global !== "undefined" ? global['classNames'] : null);
 var Immutable = (typeof window !== "undefined" ? window['Immutable'] : typeof global !== "undefined" ? global['Immutable'] : null);
@@ -358,8 +359,8 @@ var Select = React.createClass({
       if (!_this.state.isOpen) {
         return;
       }
-      var menuElem = React.findDOMNode(_this.refs.selectMenuContainer);
-      var controlElem = React.findDOMNode(_this.refs.control);
+      var menuElem = _this.refs.selectMenuContainer;
+      var controlElem = _this.refs.control;
 
       var eventOccuredOutsideMenu = _this.clickedOutsideElement(menuElem, event);
       var eventOccuredOutsideControl = _this.clickedOutsideElement(controlElem, event);
@@ -437,8 +438,8 @@ var Select = React.createClass({
     }
     if (this._focusedOptionReveal) {
       if (this.refs.focused && this.refs.menu) {
-        var focusedDOM = React.findDOMNode(this.refs.focused);
-        var menuDOM = React.findDOMNode(this.refs.menu);
+        var focusedDOM = this.refs.focused;
+        var menuDOM = this.refs.menu;
         var focusedRect = focusedDOM.getBoundingClientRect();
         var menuRect = menuDOM.getBoundingClientRect();
 
@@ -472,7 +473,7 @@ var Select = React.createClass({
     }
 
     // Normaliza implementação passando ás veses value, ás vezes option aqui:
-    if (value && typeof value == 'object' && value.value && value.label || value instanceof Immutable.Map && value.has('value') && value.has('label')) {
+    if (value != null && typeof value == 'object' && value.value != null && value.label != null || value instanceof Immutable.Map && value.has('value') && value.has('label')) {
       value = getValue(value);
     }
 
@@ -519,13 +520,15 @@ var Select = React.createClass({
       }
     }
     return values.map(function (val) {
+      if (typeof val === 'string' || typeof val === 'number') {
+        return options.find(function (op) {
+          var opValue = getValue(op);
 
-      return options.find(function (op) {
-        var opValue = getValue(op);
-        return isEqualValue(opValue, val) || typeof opValue === 'number' && opValue.toString() === val;
-
-        // auto create option
-      }) || Immutable.Map({ value: val, label: val });
+          return isEqualValue(opValue, val) || typeof opValue === 'number' && opValue.toString() === val;
+        }) || Immutable.Map({ value: val, label: val });
+      } else {
+        return val;
+      }
     });
   },
 
@@ -582,8 +585,7 @@ var Select = React.createClass({
   },
 
   getInputNode: function getInputNode() {
-    var input = this.refs.input;
-    return this.props.searchable ? input : React.findDOMNode(input);
+    return this.refs.input;
   },
 
   fireChangeEvent: function fireChangeEvent(newState) {
@@ -970,7 +972,7 @@ var Select = React.createClass({
       'is-focused': this.state.isFocused,
       'is-loading': this.state.isLoading,
       'is-disabled': this.props.disabled,
-      'has-value': this.state.value
+      'has-value': !(this.state.value == null || this.state.value === "")
     });
     var value = [];
     if (this.props.multi) {

@@ -5,6 +5,7 @@
 // Modificações para aceitar lazy immutable seq.
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Immutable = require('immutable');
 var elementSize = require("element-size");
 
@@ -66,6 +67,7 @@ var LazyRender = React.createClass({
   },
 
   getElementHeight: function(element) {
+		if(typeof(element.render) === "function"){ element = ReactDOM.findDOMNode(element); }
     var marginTop = parseInt(window.getComputedStyle(element).marginTop);
     return elementSize(element)[1] - marginTop; //remove one margin since the margins are shared by adjacent elements
   },
