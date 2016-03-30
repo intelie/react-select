@@ -1,5 +1,9 @@
 # React-Select
 
+## v0.8.0 / 2016-03-30
+
+* added; React 0.14/15 compatibility
+
 ## v0.7.2 / 2015-08-12
 
 * added; React peerDependency v0.13.0 for better compatibility
