@@ -1189,7 +1189,7 @@ describe('Select', function() {
 				});
 
 				// Focus on the input, such that mouse events are accepted
-				searchInputNode = instance.getInputNode().getDOMNode().querySelector('input');
+				searchInputNode = instance.getInputNode().querySelector('input');
 				TestUtils.Simulate.focus(searchInputNode);
 			});
 
