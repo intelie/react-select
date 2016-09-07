@@ -1,6 +1,6 @@
 {
   "name": "react-select",
-  "version": "0.7.9.0",
+  "version": "0.7.9-intelie",
   "description": "A Select control built with and for ReactJS",
   "main": "lib/Select.js",
   "author": "Jed Watson",
