@@ -451,6 +451,7 @@ var Select = React.createClass({
     if (this.props.disabled) return;
     switch (event.keyCode) {
     case 8: // backspace
+    case 48: // delete
       if (!this.state.inputValue && this.props.backspaceRemoves) {
         this.popValue();
       }
