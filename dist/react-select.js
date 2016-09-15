@@ -472,7 +472,7 @@ var Select = React.createClass({
     }
 
     // Normaliza implementação passando ás veses value, ás vezes option aqui:
-    if (value && typeof value == 'object' && value.value && value.label || value instanceof Immutable.Map && value.has('value') && value.has('label')) {
+    if (value != null && typeof value == 'object' && value.value != null && value.label != null || value instanceof Immutable.Map && value.has('value') && value.has('label')) {
       value = getValue(value);
     }
 
@@ -663,8 +663,9 @@ var Select = React.createClass({
   handleKeyDown: function handleKeyDown(event) {
     if (this.props.disabled) return;
     switch (event.keyCode) {
-      case 8:
-        // backspace
+      case 8: // backspace
+      case 48:
+        // delete
         if (!this.state.inputValue && this.props.backspaceRemoves) {
           this.popValue();
         }
@@ -970,7 +971,7 @@ var Select = React.createClass({
       'is-focused': this.state.isFocused,
       'is-loading': this.state.isLoading,
       'is-disabled': this.props.disabled,
-      'has-value': this.state.value
+      'has-value': !(this.state.value == null || this.state.value === "")
     });
     var value = [];
     if (this.props.multi) {
