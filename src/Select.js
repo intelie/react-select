@@ -20,6 +20,11 @@ getValueProp = immutableUtils.getValueProp,
 getLength = immutableUtils.getLength,
 getAt = immutableUtils.getAt;
 
+
+function hasValue(value) {
+  return value != null && value !== '';
+}
+
 var requestId = 0;
 
 // test by value, por eid if available
@@ -329,7 +334,7 @@ var Select = React.createClass({
   selectValue: function(value) {
     if (!this.props.multi) {
       this.setValue(value);
-    } else if (value) {
+    } else if (value != null) {
       this.addValue(value);
     }
     this._unbindCloseMenuIfClickedOutside();
@@ -366,7 +371,7 @@ var Select = React.createClass({
   },
 
   resetValue: function() {
-    this.setValue(this.state.value === '' ? null : this.state.value);
+    this.setValue(!hasValue(this.state.value) ? null : this.state.value);
   },
 
   getInputNode: function () {
@@ -452,7 +457,7 @@ var Select = React.createClass({
     switch (event.keyCode) {
     case 8: // backspace
     case 48: // delete
-      if (!this.state.inputValue && this.props.backspaceRemoves) {
+      if (!hasValue(this.state.inputValue) && this.props.backspaceRemoves) {
         this.popValue();
       }
       return;
@@ -749,7 +754,7 @@ var Select = React.createClass({
       'is-focused': this.state.isFocused,
       'is-loading': this.state.isLoading,
       'is-disabled': this.props.disabled,
-      'has-value': !(this.state.value == null || this.state.value === "")
+      'has-value': hasValue(this.state.value)
     });
     var value = [];
     if (this.props.multi) {
@@ -769,7 +774,7 @@ var Select = React.createClass({
       }, this);
     }
 
-    if (!this.state.inputValue && (!this.props.multi || !value.length)) {
+    if (!hasValue(this.state.inputValue) && (!this.props.multi || !value.length)) {
       var val = getAt(this.state.values, 0) || null;
       if (this.props.valueRenderer && !!getLength(this.state.values)) {
         value.push(<Value
@@ -788,7 +793,7 @@ var Select = React.createClass({
     }
 
     var loading = this.state.isLoading ? <span className="Select-loading" aria-hidden="true" /> : null;
-    var clear = this.props.clearable && this.state.value && !this.props.disabled ? <span className="Select-clear" title={this.props.multi ? this.props.clearAllText : this.props.clearValueText} aria-label={this.props.multi ? this.props.clearAllText : this.props.clearValueText} onMouseDown={this.clearValue} onClick={this.clearValue} dangerouslySetInnerHTML={{ __html: '&times;' }} /> : null;
+    var clear = this.props.clearable && hasValue(this.state.value) && !this.props.disabled ? <span className="Select-clear" title={this.props.multi ? this.props.clearAllText : this.props.clearValueText} aria-label={this.props.multi ? this.props.clearAllText : this.props.clearValueText} onMouseDown={this.clearValue} onClick={this.clearValue} dangerouslySetInnerHTML={{ __html: '&times;' }} /> : null;
 
     var menu;
     var menuProps;
