@@ -14,8 +14,9 @@ var expect = unexpected
 	.installPlugin(unexpectedDom)
 	.installPlugin(unexpectedSinon);
 
-var React = require('react/addons');
-var TestUtils = React.addons.TestUtils;
+var React = require('react');
+var ReactDOM = require('react-dom');
+var TestUtils = require('react-addons-test-utils');
 
 var Select = require('../src/Select');
 
@@ -50,7 +51,7 @@ describe('Select', function() {
 	var searchInputNode;
 
 	function getSelectControl(instance) {
-		return React.findDOMNode(instance).querySelector('.Select-control');
+		return ReactDOM.findDOMNode(instance).querySelector('.Select-control');
 	}
 
 	function pressEnterToAccept() {
@@ -82,7 +83,7 @@ describe('Select', function() {
 	}
 
 	function clickArrowToOpen() {
-		var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
+		var selectArrow = ReactDOM.findDOMNode(instance).querySelector('.Select-arrow');
 		TestUtils.Simulate.mouseDown(selectArrow);
 	}
 
@@ -94,7 +95,7 @@ describe('Select', function() {
 
 	function findAndFocusInputControl() {
 		// Focus on the input, such that mouse events are accepted
-		var searchInstance = React.findDOMNode(instance.getInputNode());
+		var searchInstance = ReactDOM.findDOMNode(instance.getInputNode());
 		searchInputNode = null;
 		if (searchInstance) {
 			searchInputNode = searchInstance.querySelector('input');
@@ -167,18 +168,18 @@ describe('Select', function() {
 
 		it('should assign the given name', function () {
 			var selectInputElement = TestUtils.scryRenderedDOMComponentsWithTag(instance, 'input')[0];
-			expect(React.findDOMNode(selectInputElement).name, 'to equal', 'form-field-name');
+			expect(ReactDOM.findDOMNode(selectInputElement).name, 'to equal', 'form-field-name');
 		});
 
 		it('should show the options on mouse click', function () {
-			TestUtils.Simulate.mouseDown(React.findDOMNode(instance).querySelector('.Select-control'));
-			var node = React.findDOMNode(instance);
+			TestUtils.Simulate.mouseDown(ReactDOM.findDOMNode(instance).querySelector('.Select-control'));
+			var node = ReactDOM.findDOMNode(instance);
 			expect(node, 'queried for', '.Select-option', 'to have length', 3);
 		});
 
 		it('should display the labels on mouse click', function () {
-			TestUtils.Simulate.mouseDown(React.findDOMNode(instance).querySelector('.Select-control'));
-			var node = React.findDOMNode(instance);
+			TestUtils.Simulate.mouseDown(ReactDOM.findDOMNode(instance).querySelector('.Select-control'));
+			var node = ReactDOM.findDOMNode(instance);
 			expect(node, 'queried for', '.Select-option:nth-child(1)', 'to have items satisfying', 'to have text', 'One');
 			expect(node, 'queried for', '.Select-option:nth-child(2)', 'to have items satisfying', 'to have text', 'Two');
 			expect(node, 'queried for', '.Select-option:nth-child(3)', 'to have items satisfying', 'to have text', 'Three');
@@ -187,7 +188,7 @@ describe('Select', function() {
 		it('should filter after entering some text', function () {
 
 			typeSearchText('T');
-			var node = React.findDOMNode(instance);
+			var node = ReactDOM.findDOMNode(instance);
 			expect(node, 'queried for', '.Select-option:nth-child(1)', 'to have items satisfying', 'to have text', 'Two');
 			expect(node, 'queried for', '.Select-option:nth-child(2)', 'to have items satisfying', 'to have text', 'Three');
 			expect(node, 'queried for', '.Select-option', 'to have length', 2);
@@ -196,7 +197,7 @@ describe('Select', function() {
 		it('should filter case insensitively', function () {
 
 			typeSearchText('t');
-			var node = React.findDOMNode(instance);
+			var node = ReactDOM.findDOMNode(instance);
 			expect(node, 'queried for', '.Select-option:nth-child(1)', 'to have items satisfying', 'to have text', 'Two');
 			expect(node, 'queried for', '.Select-option:nth-child(2)', 'to have items satisfying', 'to have text', 'Three');
 			expect(node, 'queried for', '.Select-option', 'to have length', 2);
@@ -206,7 +207,7 @@ describe('Select', function() {
 
 			// Search 'h', should only show 'Three'
 			typeSearchText('h');
-			var node = React.findDOMNode(instance);
+			var node = ReactDOM.findDOMNode(instance);
 			expect(node, 'queried for', '.Select-option:nth-child(1)', 'to have items satisfying', 'to have text', 'Three');
 			expect(node, 'queried for', '.Select-option', 'to have length', 1);
 		});
@@ -244,15 +245,15 @@ describe('Select', function() {
 
 			it('should clear the display', function () {
 
-				expect(React.findDOMNode(instance).querySelector(DISPLAYED_SELECTION_SELECTOR),
+				expect(ReactDOM.findDOMNode(instance).querySelector(DISPLAYED_SELECTION_SELECTOR),
 					'to have text', 'Selecione...');
 			});
 		});
 
 		it('should focus the first value on mouse click', function () {
 
-			TestUtils.Simulate.mouseDown(React.findDOMNode(instance).querySelector('.Select-control'));
-			expect(React.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
+			TestUtils.Simulate.mouseDown(ReactDOM.findDOMNode(instance).querySelector('.Select-control'));
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
 				'to have text', 'One');
 		});
@@ -262,7 +263,7 @@ describe('Select', function() {
 			var selectControl = getSelectControl(instance);
 			TestUtils.Simulate.mouseDown(selectControl);
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
-			expect(React.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
 				'to have text', 'Two');
 		});
@@ -273,7 +274,7 @@ describe('Select', function() {
 			TestUtils.Simulate.mouseDown(selectControl);
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
-			expect(React.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
 				'to have text', 'Three');
 		});
@@ -285,7 +286,7 @@ describe('Select', function() {
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
-			expect(React.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
 				'to have text', 'One');
 		});
@@ -295,7 +296,7 @@ describe('Select', function() {
 			var selectControl = getSelectControl(instance);
 			TestUtils.Simulate.mouseDown(selectControl);
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 38, key: 'ArrowUp' });
-			expect(React.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
 				'to have text', 'Three');
 		});
@@ -306,7 +307,7 @@ describe('Select', function() {
 			TestUtils.Simulate.mouseDown(selectControl);
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 38, key: 'ArrowUp' });
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 38, key: 'ArrowUp' });
-			expect(React.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
 				'to have text', 'Two');
 		});
@@ -316,14 +317,14 @@ describe('Select', function() {
 			var selectControl = getSelectControl(instance);
 			TestUtils.Simulate.mouseDown(selectControl);
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 27, key: 'Escape' });
-			expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+			expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 
 		});
 
 		it('should open the options on arrow down with the top option focused, when the options are closed', function () {
 
 			var selectControl = getSelectControl(instance);
-			var domNode = React.findDOMNode(instance);
+			var domNode = ReactDOM.findDOMNode(instance);
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 38, key: 'ArrowDown' });
 			expect(domNode, 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
@@ -333,7 +334,7 @@ describe('Select', function() {
 		it('should open the options on arrow up with the top option focused, when the options are closed', function () {
 
 			var selectControl = getSelectControl(instance);
-			var domNode = React.findDOMNode(instance);
+			var domNode = ReactDOM.findDOMNode(instance);
 			TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
 			expect(domNode, 'queried for', '.Select-option.is-focused',
 				'to have items satisfying',
@@ -341,18 +342,18 @@ describe('Select', function() {
 		});
 
 		it('should close the options one the second click on the arrow', function () {
-			var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
+			var selectArrow = ReactDOM.findDOMNode(instance).querySelector('.Select-arrow');
 			TestUtils.Simulate.mouseDown(selectArrow);
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-option'), 'to have length', 3);
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option'), 'to have length', 3);
 
 			TestUtils.Simulate.mouseDown(selectArrow);
-			expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+			expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 		});
 
 		it('should ignore a right mouse click on the arrow', function () {
-			var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
+			var selectArrow = ReactDOM.findDOMNode(instance).querySelector('.Select-arrow');
 			TestUtils.Simulate.mouseDown(selectArrow, { type: 'mousedown', button: 1 });
-			expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+			expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 		});
 
 
@@ -364,14 +365,14 @@ describe('Select', function() {
 				var selectControl = getSelectControl(instance);
 				TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
 
-				var optionTwo = React.findDOMNode(instance).querySelectorAll('.Select-option')[1];
+				var optionTwo = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option')[1];
 				TestUtils.SimulateNative.mouseOver(optionTwo);
 				TestUtils.SimulateNative.mouseOut(optionTwo);
 			});
 
 			it('should have no focused options', function () {
 
-				var domNode = React.findDOMNode(instance);
+				var domNode = ReactDOM.findDOMNode(instance);
 				expect(domNode, 'to contain no elements matching', '.Select-option.is-focused');
 			});
 
@@ -379,7 +380,7 @@ describe('Select', function() {
 
 				var selectControl = getSelectControl(instance);
 				TestUtils.Simulate.keyDown(selectControl, { keyCode: 40, key: 'ArrowDown' });
-				var domNode = React.findDOMNode(instance);
+				var domNode = ReactDOM.findDOMNode(instance);
 				expect(domNode, 'queried for', '.Select-option.is-focused',
 					'to have items satisfying',
 					'to have text', 'One');
@@ -390,7 +391,7 @@ describe('Select', function() {
 
 				var selectControl = getSelectControl(instance);
 				TestUtils.Simulate.keyDown(selectControl, { keyCode: 38, key: 'ArrowUp' });
-				var domNode = React.findDOMNode(instance);
+				var domNode = ReactDOM.findDOMNode(instance);
 				expect(domNode, 'queried for', '.Select-option.is-focused',
 					'to have items satisfying',
 					'to have text', 'Three');
@@ -420,26 +421,26 @@ describe('Select', function() {
 
 		it('selects the initial value', function () {
 
-			expect(React.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
 				'to have text', 'Two');
 		});
 
 		it('set the initial value of the hidden input control', function () {
 
-			expect(React.findDOMNode(wrapper).querySelector(FORM_VALUE).value, 'to equal', '2' );
+			expect(ReactDOM.findDOMNode(wrapper).querySelector(FORM_VALUE).value, 'to equal', '2' );
 		});
 
 		it('updates the value when the value prop is set', function () {
 
 			wrapper.setPropsForChild({ value: 3 });
-			expect(React.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
 				'to have text', 'Three');
 		});
 
 		it('updates the value of the hidden input control after new value prop', function () {
 
 			wrapper.setPropsForChild({ value: 3 });
-			expect(React.findDOMNode(wrapper).querySelector(FORM_VALUE).value, 'to equal', '3' );
+			expect(ReactDOM.findDOMNode(wrapper).querySelector(FORM_VALUE).value, 'to equal', '3' );
 		});
 
 		it('calls onChange with the new value as a number', function () {
@@ -453,7 +454,7 @@ describe('Select', function() {
 		it('supports setting the value to 0 via prop', function () {
 
 			wrapper.setPropsForChild({ value: 0 });
-			expect(React.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
 				'to have text', 'Zero');
 		});
 
@@ -488,7 +489,7 @@ describe('Select', function() {
 
 			it('selects the initial value', function () {
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-item .Select-item-label',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-item .Select-item-label',
 					'to satisfy', [
 						expect.it('to have text', 'Two'),
 						expect.it('to have text', 'One')
@@ -497,7 +498,7 @@ describe('Select', function() {
 
 			it('calls onChange with the correct value when 1 option is selected', function () {
 
-				var removeIcons = React.findDOMNode(instance).querySelectorAll('.Select-item .Select-item-icon');
+				var removeIcons = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item .Select-item-icon');
 				TestUtils.Simulate.click(removeIcons[0]);
 				// For multi-select, the "value" (first arg) to onChange is always a string
 				expect(onChange, 'was called with', '1', Immutable.List([{ value: 1, label: 'One' }]));
@@ -509,7 +510,7 @@ describe('Select', function() {
 					value: '3,4'
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-item .Select-item-label',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-item .Select-item-label',
 					'to satisfy', [
 						expect.it('to have text', 'Three'),
 						expect.it('to have text', 'Four')
@@ -523,7 +524,7 @@ describe('Select', function() {
 					value: 0
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-item .Select-item-label',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-item .Select-item-label',
 					'to satisfy', [
 						expect.it('to have text', 'Zero')
 					]);
@@ -566,7 +567,7 @@ describe('Select', function() {
 				it('finds text anywhere in value', function () {
 
 					typeSearchText('1');
-					expect(React.findDOMNode(instance), 'queried for', '.Select-option',
+					expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 					'to satisfy', [
 							expect.it('to have text', 'One'),
 							expect.it('to have text', 'Ten'),
@@ -577,7 +578,7 @@ describe('Select', function() {
 				it('finds text at end', function () {
 
 					typeSearchText('4');
-					expect(React.findDOMNode(instance), 'queried for', '.Select-option',
+					expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 						'to satisfy', [
 							expect.it('to have text', 'Thirty-four'),
 							expect.it('to have text', 'Fifty-four')
@@ -598,7 +599,7 @@ describe('Select', function() {
 				it('finds text at the start of the value', function () {
 
 					typeSearchText('1');
-					expect(React.findDOMNode(instance), 'queried for', '.Select-option',
+					expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 						'to satisfy', [
 							expect.it('to have text', 'One'),
 							expect.it('to have text', 'Ten')
@@ -608,9 +609,9 @@ describe('Select', function() {
 				it('does not match text at end', function () {
 
 					typeSearchText('4');
-					expect(React.findDOMNode(instance), 'to contain elements matching',
+					expect(ReactDOM.findDOMNode(instance), 'to contain elements matching',
 						'.Select-noresults');
-					expect(React.findDOMNode(instance), 'to contain no elements matching',
+					expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching',
 						'.Select-option');
 				});
 			});
@@ -627,7 +628,7 @@ describe('Select', function() {
 				it('finds text anywhere in value', function () {
 
 					typeSearchText('1');
-					expect(React.findDOMNode(instance), 'queried for', '.Select-option',
+					expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 						'to satisfy', [
 							expect.it('to have text', 'One'),
 							expect.it('to have text', 'Ten'),
@@ -638,7 +639,7 @@ describe('Select', function() {
 				it('finds text at end', function () {
 
 					typeSearchText('4');
-					expect(React.findDOMNode(instance), 'queried for', '.Select-option',
+					expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 						'to satisfy', [
 							expect.it('to have text', 'Thirty-four'),
 							expect.it('to have text', 'Fifty-four')
@@ -659,7 +660,7 @@ describe('Select', function() {
 				it('finds text at the start of the value', function () {
 
 					typeSearchText('1');
-					expect(React.findDOMNode(instance), 'queried for', '.Select-option',
+					expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 						'to satisfy', [
 							expect.it('to have text', 'One'),
 							expect.it('to have text', 'Ten')
@@ -669,9 +670,9 @@ describe('Select', function() {
 				it('does not match text at end', function () {
 
 					typeSearchText('4');
-					expect(React.findDOMNode(instance), 'to contain elements matching',
+					expect(ReactDOM.findDOMNode(instance), 'to contain elements matching',
 						'.Select-noresults');
-					expect(React.findDOMNode(instance), 'to contain no elements matching',
+					expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching',
 						'.Select-option');
 				});
 			});
@@ -697,7 +698,7 @@ describe('Select', function() {
 
 		it('starts with the given value', function () {
 
-			var node = React.findDOMNode(instance);
+			var node = ReactDOM.findDOMNode(instance);
 			expect(node, 'queried for', DISPLAYED_SELECTION_SELECTOR,
 				'to have items satisfying', 'to have text', 'One');
 		});
@@ -710,7 +711,7 @@ describe('Select', function() {
 				value: 'three'
 			});
 
-			expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 				'to have items satisfying', 'to have text', 'Three');
 		});
 
@@ -720,7 +721,7 @@ describe('Select', function() {
 				value: 'three'
 			});
 
-			expect(React.findDOMNode(wrapper).querySelector(FORM_VALUE).value, 'to equal', 'three' );
+			expect(ReactDOM.findDOMNode(wrapper).querySelector(FORM_VALUE).value, 'to equal', 'three' );
 		});
 
 		it('display the raw value if the option is not available', function () {
@@ -729,7 +730,7 @@ describe('Select', function() {
 				value: 'something new'
 			});
 
-			expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 				'to have items satisfying', 'to have text', 'something new');
 		});
 
@@ -748,7 +749,7 @@ describe('Select', function() {
 				]
 			});
 
-			expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 				'to have items satisfying', 'to have text', 'New item in the options');
 
 		});
@@ -773,7 +774,7 @@ describe('Select', function() {
 		it('adds the is-disabled class to the disabled option', function () {
 
 			clickArrowToOpen();
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-option')[1],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option')[1],
 				'to have attributes', {
 					class: 'is-disabled'
             });
@@ -782,10 +783,10 @@ describe('Select', function() {
 		it('is not selectable by clicking', function () {
 
 			clickArrowToOpen();
-			TestUtils.Simulate.mouseDown(React.findDOMNode(instance).querySelectorAll('.Select-option')[1]);
+			TestUtils.Simulate.mouseDown(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option')[1]);
 
 			expect(onChange, 'was not called');
-			expect(React.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
 				'to have text', 'Selecione...');
 		});
 
@@ -795,7 +796,7 @@ describe('Select', function() {
 			// Press down to get to the second option
 			TestUtils.Simulate.keyDown(getSelectControl(instance), { keyCode: 40, key: 'ArrowDown' });
 			// Check the disable option is not focused
-			expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option.is-disabled.is-focused');
+			expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option.is-disabled.is-focused');
 		});
 
 		it('jumps over the disabled option', function () {
@@ -804,7 +805,7 @@ describe('Select', function() {
 			// Press down to get to the second option
 			TestUtils.Simulate.keyDown(getSelectControl(instance), { keyCode: 40, key: 'ArrowDown' });
 			// Check the focused option is the one after the disabled option
-			expect(React.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
 				'to have text', 'Three');
 		});
 
@@ -824,7 +825,7 @@ describe('Select', function() {
 			TestUtils.Simulate.keyDown(getSelectControl(instance), { keyCode: 40, key: 'ArrowDown' });
 
 			// Selected option should be back to 'One'
-			expect(React.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
 				'to have text', 'One');
 		});
 
@@ -843,7 +844,7 @@ describe('Select', function() {
 			TestUtils.Simulate.keyDown(getSelectControl(instance), { keyCode: 38, key: 'ArrowUp' });
 
 			// ... and land on 'Two'
-			expect(React.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
 				'to have text', 'Two');
 		});
 
@@ -858,7 +859,7 @@ describe('Select', function() {
 			});
 
 			clickArrowToOpen();
-			expect(React.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', '.Select-option.is-focused',
 				'to have text', 'Two');
 		});
 
@@ -875,7 +876,7 @@ describe('Select', function() {
 			clickArrowToOpen();
 
 			TestUtils.Simulate.keyDown(getSelectControl(instance), { keyCode: 40, key: 'ArrowDown' });
-			expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option.is-focused');
+			expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option.is-focused');
 		});
 
 		it('doesn\'t select anything when all options are disabled and enter is pressed', function () {
@@ -892,14 +893,14 @@ describe('Select', function() {
 
 			TestUtils.Simulate.keyDown(getSelectControl(instance), { keyCode: 13, key: 'Enter' });
 			expect(onChange, 'was not called');
-			expect(React.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
 				'to have text', 'Selecione...');
 		});
 
 		it('shows disabled results in a search', function () {
 
 			typeSearchText('t');
-			var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			expect(options[0], 'to have text', 'Two');
 			expect(options[0], 'to have attributes', {
 				class: 'is-disabled'
@@ -935,14 +936,14 @@ describe('Select', function() {
 		it('has an "Add xyz" option when entering xyz', function () {
 			typeSearchText('xyz');
 
-			expect(React.findDOMNode(instance), 'queried for', '.Select-menu .Select-option',
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-menu .Select-option',
 				'to have items satisfying', 'to have text', 'Add xyz to values?');
 		});
 
 		it('fires an onChange with the new value when selecting the Add option', function () {
 
 			typeSearchText('xyz');
-			TestUtils.Simulate.click(React.findDOMNode(instance).querySelector('.Select-menu .Select-option'));
+			TestUtils.Simulate.click(ReactDOM.findDOMNode(instance).querySelector('.Select-menu .Select-option'));
 
 			expect(onChange, 'was called with', 'xyz');
 		});
@@ -950,7 +951,7 @@ describe('Select', function() {
 		it('allows updating the options with a new label, following the onChange', function () {
 
 			typeSearchText('xyz');
-			TestUtils.Simulate.click(React.findDOMNode(instance).querySelector('.Select-menu .Select-option'));
+			TestUtils.Simulate.click(ReactDOM.findDOMNode(instance).querySelector('.Select-menu .Select-option'));
 
 			expect(onChange, 'was called with', 'xyz');
 
@@ -963,7 +964,7 @@ describe('Select', function() {
 				value: 'xyz'
 			});
 
-			expect(React.findDOMNode(instance).querySelector(DISPLAYED_SELECTION_SELECTOR),
+			expect(ReactDOM.findDOMNode(instance).querySelector(DISPLAYED_SELECTION_SELECTOR),
 				'to have text', 'XYZ Label');
 		});
 
@@ -971,7 +972,7 @@ describe('Select', function() {
 
 			typeSearchText('got');
 
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
 				'to have text', 'Add got to values?');
 		});
 
@@ -979,7 +980,7 @@ describe('Select', function() {
 
 			typeSearchText('got');
 
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
 				'to have text', 'Add got to values?');
 		});
 
@@ -987,7 +988,7 @@ describe('Select', function() {
 
 			typeSearchText('test');
 
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
 				'to have text', 'Add test to values?');
 		});
 
@@ -995,9 +996,9 @@ describe('Select', function() {
 
 			typeSearchText('zzzzz');
 
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option'),
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option'),
 				'to have length', 1);
-			expect(React.findDOMNode(instance), 'queried for first', '.Select-menu .Select-option',
+			expect(ReactDOM.findDOMNode(instance), 'queried for first', '.Select-menu .Select-option',
 				'to have text', 'Add zzzzz to values?');
 		});
 
@@ -1006,12 +1007,12 @@ describe('Select', function() {
 			typeSearchText('test value');
 
 			// First item should be the add option (as the "value" is not in the collection)
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[0],
 				'to have text', 'Add test value to values?');
 			// Second item should be the existing option with the matching label
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[1],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option')[1],
 				'to have text', 'test value');
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option'),
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option'),
 				'to have length', 2);
 		});
 	});
@@ -1072,7 +1073,7 @@ describe('Select', function() {
 
 				typeSearchText('te');
 
-				var optionList = React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option');
+				var optionList = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option');
 				expect(optionList, 'to have length', 3);
 				expect(optionList[0], 'to have text', 'TEST one');
 				expect(optionList[1], 'to have text', 'TEST two');
@@ -1099,7 +1100,7 @@ describe('Select', function() {
 				typeSearchText('tes');
 				typeSearchText('te');
 				// Double check the options list is still correct
-				var optionList = React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option');
+				var optionList = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option');
 				expect(optionList, 'to have length', 3);
 				expect(optionList[0], 'to have text', 'TEST one');
 				expect(optionList[1], 'to have text', 'TEST two');
@@ -1121,7 +1122,7 @@ describe('Select', function() {
 				expect(asyncOptions, 'was called times', 2);
 				typeSearchText('tel');
 				expect(asyncOptions, 'was called times', 2);
-				var optionList = React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option');
+				var optionList = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option');
 				expect(optionList, 'to have length', 1);
 				expect(optionList[0], 'to have text', 'TELL three');
 			});
@@ -1217,7 +1218,7 @@ describe('Select', function() {
 
 				wrapper.setPropsForChild({ value: 'newValue' });
 
-				expect(React.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
+				expect(ReactDOM.findDOMNode(instance), 'queried for first', DISPLAYED_SELECTION_SELECTOR,
 					'to have text', 'New Value from Server');
 			});
 
@@ -1270,9 +1271,9 @@ describe('Select', function() {
 			pressEnterToAccept();
 			typeSearchText('th');
 			pressEnterToAccept();
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-item-label')[0],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item-label')[0],
 				'to have text', 'Four');
-			expect(React.findDOMNode(instance).querySelectorAll('.Select-item-label')[1],
+			expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item-label')[1],
 				'to have text', 'Three');
 		});
 
@@ -1284,7 +1285,7 @@ describe('Select', function() {
 
 			typeSearchText('o');
 
-			var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			// expect(options[0], 'to have text', 'Adicionar o ?');
 			expect(options[0], 'to have text', 'One');
 			expect(options[1], 'to have text', 'Two');
@@ -1318,7 +1319,7 @@ describe('Select', function() {
 			pressBackspace();
 
 			expect(onChange, 'was not called');
-			var items = React.findDOMNode(instance).querySelectorAll('.Select-item-label');
+			var items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item-label');
 			expect(items[0], 'to have text', 'Four');
 			expect(items[1], 'to have text', 'Three');
 		});
@@ -1333,7 +1334,7 @@ describe('Select', function() {
 			pressEnterToAccept();
 			onChange.reset();  // Ignore previous onChange calls
 
-			var threeDeleteButton = React.findDOMNode(instance).querySelectorAll('.Select-item-icon')[1];
+			var threeDeleteButton = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item-icon')[1];
 			TestUtils.Simulate.click(threeDeleteButton);
 
 			expect(onChange, 'was called with', 'four,two', Immutable.List([
@@ -1378,7 +1379,7 @@ describe('Select', function() {
 					]
 				});
 
-				var items = React.findDOMNode(instance).querySelectorAll('.Select-item');
+				var items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item');
 
 				expect(items[0], 'queried for', '.Select-item-label',
 					'to have items satisfying',
@@ -1425,12 +1426,12 @@ describe('Select', function() {
 
 			clickArrowToOpen();
 
-			var items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			var items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			TestUtils.Simulate.mouseDown(items[1]);
-			items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			TestUtils.Simulate.mouseDown(items[0]);
 
-			var selectedItems = React.findDOMNode(instance).querySelectorAll('.Select-item-label');
+			var selectedItems = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item-label');
 			expect(selectedItems[0], 'to have text', 'Two');
 			expect(selectedItems[1], 'to have text', 'One');
 			expect(selectedItems, 'to have length', 2);
@@ -1440,13 +1441,13 @@ describe('Select', function() {
 
 			clickArrowToOpen();
 			// First item
-			var items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			var items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			TestUtils.Simulate.mouseDown(items[1]);
 			expect(onChange, 'was called once');
 			expect(onChange, 'was called with', 'two', Immutable.List([{ value: 'two', label: 'Two' }]));
 
 			// Second item
-			items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			TestUtils.Simulate.mouseDown(items[0]);
 			expect(onChange, 'was called twice');
 		});
@@ -1455,7 +1456,7 @@ describe('Select', function() {
 
 			clickArrowToOpen();
 
-			var items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			var items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 
 			// Click the option "Two" to select it
 			expect(items[1], 'to have text', 'Two');
@@ -1463,7 +1464,7 @@ describe('Select', function() {
 			expect(onChange, 'was called times', 1);
 
 			// Now get the list again,
-			items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			expect(items[0], 'to have text', 'One');
 			expect(items[1], 'to have text', 'Three');
 			expect(items[2], 'to have text', 'Four');
@@ -1473,7 +1474,7 @@ describe('Select', function() {
 			TestUtils.Simulate.mouseDown(items[0]);
 
 			expect(onChange, 'was called times', 2);
-			items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			expect(items[0], 'to have text', 'Three');
 			expect(items[1], 'to have text', 'Four');
 			expect(items, 'to have length', 2);
@@ -1482,7 +1483,7 @@ describe('Select', function() {
 			TestUtils.Simulate.mouseDown(items[1]);
 			expect(onChange, 'was called times', 3);
 
-			items = React.findDOMNode(instance).querySelectorAll('.Select-option');
+			items = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 			expect(items[0], 'to have text', 'Three');
 			expect(items, 'to have length', 1);
 		});
@@ -1497,7 +1498,7 @@ describe('Select', function() {
 			it('assigns the className to the outer-most element', function () {
 
 				var instance = createControl({ className: 'test-class' });
-				expect(React.findDOMNode(instance), 'to have attributes', {
+				expect(ReactDOM.findDOMNode(instance), 'to have attributes', {
 					class: 'test-class'
 				});
 			});
@@ -1513,7 +1514,7 @@ describe('Select', function() {
 					value: 'three'
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+				expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 					'to have items satisfying', 'to have text', 'Three');
 
 			});
@@ -1532,20 +1533,20 @@ describe('Select', function() {
 
 				it('resets the display value', function () {
 
-					expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+					expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 						'to have items satisfying', 'to have text', 'Selecione...');
 				});
 
 				it('resets the control value', function () {
 
-					expect(React.findDOMNode(instance).querySelector('input').value, 'to equal', '');
+					expect(ReactDOM.findDOMNode(instance).querySelector('input').value, 'to equal', '');
 				});
 			});
 
 			describe('on clicking `clear`', function () {
 
 				beforeEach(function () {
-					TestUtils.Simulate.click(React.findDOMNode(instance).querySelector('.Select-clear'));
+					TestUtils.Simulate.click(ReactDOM.findDOMNode(instance).querySelector('.Select-clear'));
 				});
 
 				it('calls onChange with empty', function () {
@@ -1555,13 +1556,13 @@ describe('Select', function() {
 
 				it('resets the display value', function () {
 
-					expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+					expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 						'to have items satisfying', 'to have text', 'Selecione...');
 				});
 
 				it('resets the control value', function () {
 
-					expect(React.findDOMNode(instance).querySelector('input').value, 'to equal', '');
+					expect(ReactDOM.findDOMNode(instance).querySelector('input').value, 'to equal', '');
 				});
 			});
 		});
@@ -1576,14 +1577,14 @@ describe('Select', function() {
 					value: 'three'
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+				expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 					'to have items satisfying', 'to have text', 'Three');
 
 			});
 
 			it('does not render a clear button', function () {
 
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-clear');
+				expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-clear');
 			});
 
 			describe('on escape', function () {
@@ -1599,13 +1600,13 @@ describe('Select', function() {
 
 				it('does not reset the display value', function () {
 
-					expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+					expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 						'to have items satisfying', 'to have text', 'Three');
 				});
 
 				it('does not reset the control value', function () {
 
-					expect(React.findDOMNode(instance).querySelector('input').value, 'to equal', 'three');
+					expect(ReactDOM.findDOMNode(instance).querySelector('input').value, 'to equal', 'three');
 				});
 
 			});
@@ -1625,17 +1626,17 @@ describe('Select', function() {
 
 					it('closes the menu', function () {
 
-						expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-menu');
+						expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-menu');
 					});
 
 					it('resets the control value to the original', function () {
 
-						expect(React.findDOMNode(instance).querySelector('input').value, 'to equal', 'three');
+						expect(ReactDOM.findDOMNode(instance).querySelector('input').value, 'to equal', 'three');
 					});
 
 					it('renders the original display label', function () {
 
-						expect(React.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
+						expect(ReactDOM.findDOMNode(instance), 'queried for', DISPLAYED_SELECTION_SELECTOR,
 							'to have items satisfying', 'to have text', 'Three');
 					});
 				});
@@ -1658,7 +1659,7 @@ describe('Select', function() {
 
 			it('uses the prop as the title for clear', function () {
 
-				expect(React.findDOMNode(instance).querySelector('.Select-clear'), 'to have attributes', {
+				expect(ReactDOM.findDOMNode(instance).querySelector('.Select-clear'), 'to have attributes', {
 					title: 'Remove All Items Test Title'
 				});
 			});
@@ -1680,7 +1681,7 @@ describe('Select', function() {
 
 			it('uses the prop as the title for clear', function () {
 
-				expect(React.findDOMNode(instance).querySelector('.Select-clear'), 'to have attributes', {
+				expect(ReactDOM.findDOMNode(instance).querySelector('.Select-clear'), 'to have attributes', {
 					title: 'Remove Value Test Title'
 				});
 			});
@@ -1702,7 +1703,7 @@ describe('Select', function() {
 
 				it('interprets the initial options correctly', function () {
 
-					var values = React.findDOMNode(instance).querySelectorAll('.Select-item');
+					var values = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item');
 
 					expect(values[0], 'queried for', '.Select-item-label', 'to have items satisfying',
 						'to have text', 'AbcDef');
@@ -1737,7 +1738,7 @@ describe('Select', function() {
 
 				it('interprets the initial options correctly', function () {
 
-					var values = React.findDOMNode(instance).querySelectorAll('.Select-item');
+					var values = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item');
 
 					expect(values[0], 'queried for', '.Select-item-label', 'to have items satisfying',
 						'to have text', 'AbcDef');
@@ -1779,24 +1780,24 @@ describe('Select', function() {
 			it('does not react to keyDown', function () {
 
 				TestUtils.Simulate.keyDown(getSelectControl(instance), { keyCode: 40, key: 'ArrowDown' });
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+				expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 			});
 
 			it('does not respond to mouseDown', function () {
 
 				TestUtils.Simulate.mouseDown(getSelectControl(instance));
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+				expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 			});
 
 			it('does not respond to mouseDown on the arrow', function () {
 
 				TestUtils.Simulate.mouseDown(getSelectControl(instance).querySelector('.Select-arrow'));
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+				expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 			});
 
 			it('renders the given value', function () {
 
-				expect(React.findDOMNode(instance).querySelector(DISPLAYED_SELECTION_SELECTOR), 'to have text', 'Three');
+				expect(ReactDOM.findDOMNode(instance).querySelector(DISPLAYED_SELECTION_SELECTOR), 'to have text', 'Three');
 			});
 		});
 
@@ -1850,10 +1851,10 @@ describe('Select', function() {
 
 				it('only shows the filtered option', function () {
 
-					expect(React.findDOMNode(instance).querySelectorAll('.Select-option'),
+					expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option'),
 						'to have length', 1);
 
-					expect(React.findDOMNode(instance).querySelectorAll('.Select-option'),
+					expect(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option'),
 						'to have items satisfying',
 						'to have text', 'AbcDef');
 				});
@@ -1891,9 +1892,9 @@ describe('Select', function() {
 
 			it('uses the returned options', function () {
 
-				TestUtils.Simulate.mouseDown(React.findDOMNode(instance).querySelector('.Select-arrow'));
+				TestUtils.Simulate.mouseDown(ReactDOM.findDOMNode(instance).querySelector('.Select-arrow'));
 
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options[0], 'to have text', 'Return One');
 				expect(options[1], 'to have text', 'Return Two');
 				expect(options, 'to have length', 2);
@@ -1913,7 +1914,7 @@ describe('Select', function() {
 				]);
 				typeSearchText('xyz');
 
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options[0], 'to have text', 'AAbbcc');
 				expect(options[1], 'to have text', 'DDeeff');
 				expect(options, 'to have length', 2);
@@ -1934,13 +1935,13 @@ describe('Select', function() {
 			it('does not find options in a different case', function () {
 
 				typeSearchText('def');
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+				expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 			});
 
 			it('finds options in the same case', function () {
 
 				typeSearchText('Def');
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options[0], 'to have text', 'AbcDef');
 				expect(options, 'to have length', 1);
 			});
@@ -1977,7 +1978,7 @@ describe('Select', function() {
 
 			it('adds the className on to the auto-size input', function () {
 
-				expect(React.findDOMNode(instance.getInputNode()),
+				expect(ReactDOM.findDOMNode(instance.getInputNode()),
 					'to have attributes', {
 						class: ['extra-class-name', 'Select-input']
 					});
@@ -2000,7 +2001,7 @@ describe('Select', function() {
 
 				it('sets the className and id on the placeholder for the input', function () {
 
-					expect(React.findDOMNode(instance).querySelector('.extra-class-name'),
+					expect(ReactDOM.findDOMNode(instance).querySelector('.extra-class-name'),
 						'to have attributes', {
 							id: 'search-input-id'
 						});
@@ -2025,8 +2026,8 @@ describe('Select', function() {
 
 				it('doesn\'t pass the inputProps through', function () {
 
-					expect(React.findDOMNode(instance), 'to contain no elements matching', '.extra-class-name');
-					expect(React.findDOMNode(instance), 'to contain no elements matching', '#search-input-id');
+					expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.extra-class-name');
+					expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '#search-input-id');
 				});
 			});
 		});
@@ -2045,7 +2046,7 @@ describe('Select', function() {
 			it('searches only at the start', function () {
 
 				typeSearchText('o');
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options[0], 'to have text', 'One');
 				expect(options, 'to have length', 1);
 			});
@@ -2070,7 +2071,7 @@ describe('Select', function() {
 			it('searches only the value', function () {
 
 				typeSearchText('aa');  // Matches value "three", and label "AbcDef"
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options, 'to have length', 1);
 				expect(options[0], 'to have text', '111');
 			});
@@ -2095,7 +2096,7 @@ describe('Select', function() {
 			it('searches only the value', function () {
 
 				typeSearchText('bb');  // Matches value "three", and label "AbcDef"
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options, 'to have length', 1);
 				expect(options[0], 'to have text', 'bbb');
 			});
@@ -2121,7 +2122,7 @@ describe('Select', function() {
 			it('searches only the value', function () {
 
 				typeSearchText('aa');  // Matches value "three", and label "AbcDef"
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options, 'to have length', 1);
 				expect(options[0], 'to have text', '111');
 			});
@@ -2147,7 +2148,7 @@ describe('Select', function() {
 			it('searches only the label', function () {
 
 				typeSearchText('bb');  // Matches value "three", and label "AbcDef"
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 				expect(options, 'to have length', 1);
 				expect(options[0], 'to have text', 'bbb');
 			});
@@ -2167,7 +2168,7 @@ describe('Select', function() {
 			it('displays the text when no results are found', function () {
 
 				typeSearchText('DOES NOT EXIST');
-				expect(React.findDOMNode(instance).querySelector('.Select-menu'),
+				expect(ReactDOM.findDOMNode(instance).querySelector('.Select-menu'),
 					'to have text', 'No results unit test');
 			});
 
@@ -2178,7 +2179,7 @@ describe('Select', function() {
 				});
 
 				typeSearchText('DOES NOT EXIST');
-				expect(React.findDOMNode(instance).querySelector('.Select-menu'),
+				expect(ReactDOM.findDOMNode(instance).querySelector('.Select-menu'),
 					'to have text', 'Updated no results text');
 			});
 		});
@@ -2238,13 +2239,13 @@ describe('Select', function() {
 
 			it('calls the function when clicking on a label', function () {
 
-				TestUtils.Simulate.click(React.findDOMNode(instance).querySelector('.Select-item-label a'));
+				TestUtils.Simulate.click(ReactDOM.findDOMNode(instance).querySelector('.Select-item-label a'));
 				expect(onOptionLabelClick, 'was called once');
 			});
 
 			it('calls the function with the value', function () {
 
-				TestUtils.Simulate.click(React.findDOMNode(instance).querySelectorAll('.Select-item-label a')[0]);
+				TestUtils.Simulate.click(ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item-label a')[0]);
 				expect(onOptionLabelClick, 'was called with', { value: 'two', label: '222' });
 			});
 		});
@@ -2271,9 +2272,9 @@ describe('Select', function() {
 
 			it('renders the options using the optionRenderer', function () {
 
-				var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
+				var selectArrow = ReactDOM.findDOMNode(instance).querySelector('.Select-arrow');
 				TestUtils.Simulate.mouseDown(selectArrow);
-				var options = React.findDOMNode(instance).querySelectorAll('.Select-option');
+				var options = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-option');
 
 				expect(options[0].querySelector('span'), 'to have attributes', {
 					id: 'TESTOPTION_one'
@@ -2286,7 +2287,7 @@ describe('Select', function() {
 			});
 
 			it('calls the renderer exactly once for each option', function () {
-				var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
+				var selectArrow = ReactDOM.findDOMNode(instance).querySelector('.Select-arrow');
 				TestUtils.Simulate.mouseDown(selectArrow);
 				expect(optionRenderer, 'was called times', 4);
 			});
@@ -2304,7 +2305,7 @@ describe('Select', function() {
 			});
 
 			it('uses the placeholder initially', function () {
-				expect(React.findDOMNode(instance), 'queried for', '.Select-placeholder',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-placeholder',
 					'to have items satisfying',
 					'to have text', 'Choose Option Placeholder test');
 			});
@@ -2315,7 +2316,7 @@ describe('Select', function() {
 					value: 'three'
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-placeholder',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-placeholder',
 					'to have items satisfying',
 					'to have text', 'Three');
 			});
@@ -2330,7 +2331,7 @@ describe('Select', function() {
 					value: null
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-placeholder',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-placeholder',
 					'to have items satisfying',
 					'to have text', 'Choose Option Placeholder test');
 			});
@@ -2341,7 +2342,7 @@ describe('Select', function() {
 					placeholder: 'New placeholder from props'
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-placeholder',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-placeholder',
 					'to have items satisfying',
 					'to have text', 'New placeholder from props');
 			});
@@ -2372,7 +2373,7 @@ describe('Select', function() {
 					value: null
 				});
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-placeholder',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-placeholder',
 					'to have items satisfying',
 					'to have text', 'Three');
 
@@ -2395,10 +2396,10 @@ describe('Select', function() {
 
 			it('uses the searchPromptText before text is entered', function () {
 
-				var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
+				var selectArrow = ReactDOM.findDOMNode(instance).querySelector('.Select-arrow');
 				TestUtils.Simulate.mouseDown(selectArrow);
 
-				expect(React.findDOMNode(instance), 'queried for', '.Select-noresults',
+				expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-noresults',
 					'to have items satisfying',
 					'to have text', 'Unit test prompt text');
 			});
@@ -2409,13 +2410,13 @@ describe('Select', function() {
 					options: [{ value: 'abcd', label: 'ABCD' }]
 				});
 
-				var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
+				var selectArrow = ReactDOM.findDOMNode(instance).querySelector('.Select-arrow');
 				TestUtils.Simulate.mouseDown(selectArrow);
 
 				typeSearchText('abc');
 				expect(asyncOptions, 'was called once');
 
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-noresults');
+				expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-noresults');
 			});
 		});
 
@@ -2443,7 +2444,7 @@ describe('Select', function() {
 
 			it('renders the value using the provided renderer', function () {
 
-				var labelNode = React.findDOMNode(instance).querySelector('.Select-value span');
+				var labelNode = ReactDOM.findDOMNode(instance).querySelector('.Select-value span');
 				expect(labelNode, 'to have text', 'THREE');
 				expect(labelNode, 'to have attributes', {
 					id: 'TESTOPTION_three'
@@ -2474,7 +2475,7 @@ describe('Select', function() {
 
 			it('renders the values using the provided renderer', function () {
 
-				var labelNode = React.findDOMNode(instance).querySelectorAll('.Select-item-label span');
+				var labelNode = ReactDOM.findDOMNode(instance).querySelectorAll('.Select-item-label span');
 				expect(labelNode[0], 'to have text', 'THREE');
 				expect(labelNode[0], 'to have attributes', {
 					id: 'TESTOPTION_three'
@@ -2499,11 +2500,11 @@ describe('Select', function() {
 		it('closes the menu', function () {
 
 			TestUtils.Simulate.mouseDown(getSelectControl(instance));
-			expect(React.findDOMNode(instance), 'queried for', '.Select-option',
+			expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 				'to have length', 4);
 
 			clickDocument();
-			expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
+			expect(ReactDOM.findDOMNode(instance), 'to contain no elements matching', '.Select-option');
 		});
 	});
 });

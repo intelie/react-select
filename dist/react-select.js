@@ -223,6 +223,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var Input = (typeof window !== "undefined" ? window['AutosizeInput'] : typeof global !== "undefined" ? global['AutosizeInput'] : null);
+var ReactDOM = require('react-dom');
 var classes = (typeof window !== "undefined" ? window['classNames'] : typeof global !== "undefined" ? global['classNames'] : null);
 var Immutable = (typeof window !== "undefined" ? window['Immutable'] : typeof global !== "undefined" ? global['Immutable'] : null);
 var Value = require('./Value');
@@ -362,8 +363,8 @@ var Select = React.createClass({
       if (!_this.state.isOpen) {
         return;
       }
-      var menuElem = React.findDOMNode(_this.refs.selectMenuContainer);
-      var controlElem = React.findDOMNode(_this.refs.control);
+      var menuElem = ReactDOM.findDOMNode(_this.refs.selectMenuContainer);
+      var controlElem = ReactDOM.findDOMNode(_this.refs.control);
 
       var eventOccuredOutsideMenu = _this.clickedOutsideElement(menuElem, event);
       var eventOccuredOutsideControl = _this.clickedOutsideElement(controlElem, event);
@@ -441,8 +442,8 @@ var Select = React.createClass({
     }
     if (this._focusedOptionReveal) {
       if (this.refs.focused && this.refs.menu) {
-        var focusedDOM = React.findDOMNode(this.refs.focused);
-        var menuDOM = React.findDOMNode(this.refs.menu);
+        var focusedDOM = ReactDOM.findDOMNode(this.refs.focused);
+        var menuDOM = ReactDOM.findDOMNode(this.refs.menu);
         var focusedRect = focusedDOM.getBoundingClientRect();
         var menuRect = menuDOM.getBoundingClientRect();
 
@@ -475,7 +476,7 @@ var Select = React.createClass({
       placeholder = this.props.placeholder;
     }
 
-    // Normaliza implementação passando ás veses value, ás vezes option aqui:
+    // Normaliza implementação passando às vezes value, às vezes option aqui:
     if (value != null && typeof value == 'object' && value.value != null && value.label != null || value instanceof Immutable.Map && value.has('value') && value.has('label')) {
       value = getValue(value);
     }
@@ -587,7 +588,7 @@ var Select = React.createClass({
 
   getInputNode: function getInputNode() {
     var input = this.refs.input;
-    return this.props.searchable ? input : React.findDOMNode(input);
+    return this.props.searchable ? input : ReactDOM.findDOMNode(input);
   },
 
   fireChangeEvent: function fireChangeEvent(newState) {
@@ -941,7 +942,7 @@ var Select = React.createClass({
       var mouseLeave = this.unfocusOption.bind(this, op);
       var mouseDown = this.selectValue.bind(this, op);
       var optionResult = React.createElement(this.props.optionComponent, {
-        key: 'option-' + getValue(op),
+        key: 'option-' + getValue(op) + key,
         className: optionClass,
         renderFunc: renderLabel,
         mouseEnter: mouseEnter,
@@ -1107,7 +1108,7 @@ var Select = React.createClass({
 module.exports = Select;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./LazyRender":1,"./Option":2,"./SingleValue":4,"./Value":5,"./arrayFindPolyfill":6,"./immutable/utils":7}],4:[function(require,module,exports){
+},{"./LazyRender":1,"./Option":2,"./SingleValue":4,"./Value":5,"./arrayFindPolyfill":6,"./immutable/utils":7,"react-dom":undefined}],4:[function(require,module,exports){
 (function (global){
 "use strict";
 
