@@ -72,6 +72,8 @@ var Select = React.createClass({
     onBlur: React.PropTypes.func,              // onBlur handler: function(event) {}
     onChange: React.PropTypes.func,            // onChange handler: function(newValue) {}
     onFocus: React.PropTypes.func,             // onFocus handler: function(event) {}
+    onItemMouseEnter: React.PropTypes.func,    // triggered on option focus
+    onDropDownClose: React.PropTypes.func,     // trigerred both when select option and when menu close
     onOptionLabelClick: React.PropTypes.func,  // onCLick handler for value labels: function (value, event) {}
     optionComponent: React.PropTypes.func,     // option component to render in dropdown
     optionRenderer: React.PropTypes.func,      // optionRenderer: function(option) {}
@@ -148,6 +150,9 @@ var Select = React.createClass({
     this._optionsCache = {};
     this._optionsFilterString = '';
     this._closeMenuIfClickedOutside = (event) => {
+      if (_this.props.onDropDownClose) {
+        _this.props.onDropDownClose();
+      }
       if (!this.state.isOpen) {
         return;
       }
@@ -333,6 +338,9 @@ var Select = React.createClass({
   },
 
   selectValue: function(value) {
+    if (this.props.onDropDownClose) {
+      this.props.onDropDownClose();
+    }
     if (!this.props.multi) {
       this.setValue(value);
     } else if (value != null) {
@@ -625,6 +633,9 @@ var Select = React.createClass({
   },
 
   focusOption: function(op) {
+    if (this.props.onItemMouseEnter) {
+      this.props.onItemMouseEnter(op);
+    }
     this.setState({
       focusedOption: op
     });
