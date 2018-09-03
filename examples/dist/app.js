@@ -2,20 +2,21 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 
 var Gravatar = require('react-gravatar');
 
-var Option = React.createClass({
+var Option = createClass({
   displayName: 'Option',
 
   propTypes: {
-    addLabelText: React.PropTypes.string,
-    className: React.PropTypes.string,
-    mouseDown: React.PropTypes.func,
-    mouseEnter: React.PropTypes.func,
-    mouseLeave: React.PropTypes.func,
-    option: React.PropTypes.object.isRequired,
-    renderFunc: React.PropTypes.func
+    addLabelText: PropTypes.string,
+    className: PropTypes.string,
+    mouseDown: PropTypes.func,
+    mouseEnter: PropTypes.func,
+    mouseLeave: PropTypes.func,
+    option: PropTypes.object.isRequired,
+    renderFunc: PropTypes.func
   },
 
   render: function render() {
@@ -41,14 +42,15 @@ module.exports = Option;
 'use strict';
 
 var React = require('react');
+var createClass = require('create-react-class');
 var Gravatar = require('react-gravatar');
 
-var SingleValue = React.createClass({
+var SingleValue = createClass({
   displayName: 'SingleValue',
 
   propTypes: {
-    placeholder: React.PropTypes.string,
-    value: React.PropTypes.object
+    placeholder: PropTypes.string,
+    value: PropTypes.object
   },
 
   render: function render() {
@@ -89,7 +91,7 @@ function logChange() {
 	console.log.apply(console, [].concat(['Select value changed: '], Array.prototype.slice.apply(arguments)));
 }
 
-var CountrySelect = React.createClass({
+var CountrySelect = createClass({
 	displayName: 'CountrySelect',
 
 	onClick: function onClick() {
@@ -105,7 +107,7 @@ var CountrySelect = React.createClass({
 	}
 });
 
-var UsersField = React.createClass({
+var UsersField = createClass({
 	displayName: 'UsersField',
 
 	getDefaultProps: function getDefaultProps() {
@@ -134,7 +136,7 @@ var UsersField = React.createClass({
 	}
 });
 
-var ValuesAsNumbersField = React.createClass({
+var ValuesAsNumbersField = createClass({
 	displayName: 'ValuesAsNumbersField',
 
 	getInitialState: function getInitialState() {
@@ -240,7 +242,7 @@ var ValuesAsNumbersField = React.createClass({
 	}
 });
 
-var StatesField = React.createClass({
+var StatesField = createClass({
 	displayName: 'StatesField',
 
 	getDefaultProps: function getDefaultProps() {
@@ -319,7 +321,7 @@ var StatesField = React.createClass({
 	}
 });
 
-var RemoteSelectField = React.createClass({
+var RemoteSelectField = createClass({
 	displayName: 'RemoteSelectField',
 
 	loadOptions: function loadOptions(input, callback) {
@@ -362,7 +364,7 @@ var RemoteSelectField = React.createClass({
 	}
 });
 
-var MultiSelectField = React.createClass({
+var MultiSelectField = createClass({
 	displayName: 'MultiSelectField',
 
 	getInitialState: function getInitialState() {
@@ -407,7 +409,7 @@ var MultiSelectField = React.createClass({
 	}
 });
 
-var SelectedValuesField = React.createClass({
+var SelectedValuesField = createClass({
 	displayName: 'SelectedValuesField',
 
 	onLabelClick: function onLabelClick(data, event) {
@@ -434,7 +436,7 @@ var SelectedValuesField = React.createClass({
 	}
 });
 
-var SelectedValuesFieldDisabled = React.createClass({
+var SelectedValuesFieldDisabled = createClass({
 	displayName: 'SelectedValuesFieldDisabled',
 
 	onLabelClick: function onLabelClick(data, event) {
@@ -461,7 +463,7 @@ var SelectedValuesFieldDisabled = React.createClass({
 	}
 });
 
-var SelectedValuesFieldCreate = React.createClass({
+var SelectedValuesFieldCreate = createClass({
 	displayName: 'SelectedValuesFieldCreate',
 
 	onLabelClick: function onLabelClick(data, event) {
@@ -489,7 +491,7 @@ var SelectedValuesFieldCreate = React.createClass({
 	}
 });
 
-var CustomRenderField = React.createClass({
+var CustomRenderField = createClass({
 	displayName: 'CustomRenderField',
 
 	onLabelClick: function onLabelClick(data, event) {
@@ -533,7 +535,7 @@ var CustomRenderField = React.createClass({
 	}
 });
 
-var CustomRenderMultiField = React.createClass({
+var CustomRenderMultiField = createClass({
 	displayName: 'CustomRenderMultiField',
 
 	onLabelClick: function onLabelClick(data, event) {
@@ -579,7 +581,7 @@ var CustomRenderMultiField = React.createClass({
 	}
 });
 
-var ImmutableField = React.createClass({
+var ImmutableField = createClass({
 	displayName: 'ImmutableField',
 
 	onLabelClick: function onLabelClick(data, event) {
@@ -605,7 +607,7 @@ var ImmutableField = React.createClass({
 	}
 });
 
-var LazyField = React.createClass({
+var LazyField = createClass({
 	displayName: 'LazyField',
 
 	onLabelClick: function onLabelClick(data, event) {
@@ -1189,15 +1191,15 @@ querystring = require('querystring');
 
 isRetina = require('is-retina');
 
-module.exports = React.createClass({
+module.exports = createClass({
   displayName: 'Gravatar',
   propTypes: {
-    email: React.PropTypes.string.isRequired,
-    size: React.PropTypes.number,
-    rating: React.PropTypes.string,
-    https: React.PropTypes.bool,
-    "default": React.PropTypes.string,
-    className: React.PropTypes.string
+    email: PropTypes.string.isRequired,
+    size: PropTypes.number,
+    rating: PropTypes.string,
+    https: PropTypes.bool,
+    "default": PropTypes.string,
+    className: PropTypes.string
   },
   getDefaultProps: function() {
     return {

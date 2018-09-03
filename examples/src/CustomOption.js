@@ -1,16 +1,18 @@
 var React = require('react');
+var PropTypes = require('prop-types');
+var createClass = require('create-react-class');
 
 var Gravatar = require('react-gravatar');
 
-var Option = React.createClass({
+var Option = createClass({
   propTypes: {
-    addLabelText: React.PropTypes.string,
-    className: React.PropTypes.string,
-    mouseDown: React.PropTypes.func,
-    mouseEnter: React.PropTypes.func,
-    mouseLeave: React.PropTypes.func,
-    option: React.PropTypes.object.isRequired,
-    renderFunc: React.PropTypes.func
+    addLabelText: PropTypes.string,
+    className: PropTypes.string,
+    mouseDown: PropTypes.func,
+    mouseEnter: PropTypes.func,
+    mouseLeave: PropTypes.func,
+    option: PropTypes.object.isRequired,
+    renderFunc: PropTypes.func
   },
 
   render: function() {

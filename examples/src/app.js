@@ -1,6 +1,7 @@
 /* eslint react/prop-types: 0 */
 
 var React = require('react');
+var createClass = require('create-react-class');
 var Select = require('react-select');
 var Immutable = require('immutable');
 var GravatarOption = require('./CustomOption');
@@ -14,7 +15,7 @@ function logChange() {
 	console.log.apply(console, [].concat(['Select value changed: '], Array.prototype.slice.apply(arguments)));
 }
 
-var CountrySelect = React.createClass({
+var CountrySelect = createClass({
 	onClick: function() {
 		this.props.onSelect(this.props.value);
 	},
@@ -24,7 +25,7 @@ var CountrySelect = React.createClass({
 	}
 });
 
-var UsersField = React.createClass({
+var UsersField = createClass({
 	getDefaultProps: function () {
 		return {
 			searchable: true,
@@ -47,7 +48,7 @@ var UsersField = React.createClass({
 	}
 });
 
-var ValuesAsNumbersField = React.createClass({
+var ValuesAsNumbersField = createClass({
 	
 	getInitialState: function () {
 		return {
@@ -136,7 +137,7 @@ var ValuesAsNumbersField = React.createClass({
 	}
 });
 
-var StatesField = React.createClass({
+var StatesField = createClass({
 	getDefaultProps: function () {
 		return {
 			searchable: true,
@@ -189,7 +190,7 @@ var StatesField = React.createClass({
 	}
 });
 
-var RemoteSelectField = React.createClass({
+var RemoteSelectField = createClass({
 	loadOptions: function(input, callback) {
 		input = input.toLowerCase();
 		var rtn = {
@@ -239,7 +240,7 @@ var RemoteSelectField = React.createClass({
 });
 
 
-var MultiSelectField = React.createClass({
+var MultiSelectField = createClass({
 	getInitialState: function() {
 		return {
 			disabled: false,
@@ -277,7 +278,7 @@ var MultiSelectField = React.createClass({
 	}
 });
 
-var SelectedValuesField = React.createClass({
+var SelectedValuesField = createClass({
 	onLabelClick: function (data, event) {
 		console.log(data, event);
 	},
@@ -306,7 +307,7 @@ var SelectedValuesField = React.createClass({
 });
 
 
-var SelectedValuesFieldDisabled = React.createClass({
+var SelectedValuesFieldDisabled = createClass({
 	onLabelClick: function (data, event) {
 		console.log(data, event);
 	},
@@ -334,7 +335,7 @@ var SelectedValuesFieldDisabled = React.createClass({
 	}
 });
 
-var SelectedValuesFieldCreate = React.createClass({
+var SelectedValuesFieldCreate = createClass({
 	onLabelClick: function (data, event) {
 		console.log(data, event);
 	},
@@ -360,7 +361,7 @@ var SelectedValuesFieldCreate = React.createClass({
 	}
 });
 
-var CustomRenderField = React.createClass({
+var CustomRenderField = createClass({
 	onLabelClick: function (data, event) {
 		console.log(data, event);
 	},
@@ -392,7 +393,7 @@ var CustomRenderField = React.createClass({
 	}
 });
 
-var CustomRenderMultiField = React.createClass({
+var CustomRenderMultiField = createClass({
 	onLabelClick: function (data, event) {
 		console.log(data, event);
 	},
@@ -426,7 +427,7 @@ var CustomRenderMultiField = React.createClass({
 	}
 });
 
-var ImmutableField = React.createClass({
+var ImmutableField = createClass({
 	onLabelClick: function (data, event) {
 		console.log(data, event);
 	},
@@ -450,7 +451,7 @@ var ImmutableField = React.createClass({
 	}
 });
 
-var LazyField = React.createClass({
+var LazyField = createClass({
 	onLabelClick: function (data, event) {
 		console.log(data, event);
 	},
